@@ -1,5 +1,6 @@
-from fastapi import Depends, HTTPException, Request, status
+from fastapi import Depends, HTTPException, Request, status, BackgroundTasks
 from fastapi.security import OAuth2PasswordBearer
+import secrets
 from sqlalchemy.orm import Session
 
 from app.common.security.jwt_handler import (
@@ -9,6 +10,7 @@ from app.common.security.jwt_handler import (
 )
 from app.common.security.password import hash_password, verify_password
 from app.common.security.token_hash import hash_token, verify_token_hash
+from app.common.mail.sender import send_email, get_action_email_template
 from app.db.session import get_db
 from app.modules.user_sessions.repositories import user_session_repository
 from app.modules.users.models.user_model import User
@@ -20,12 +22,18 @@ from app.modules.users.schemas.user_schema import (
     UserLogin,
     UserRead,
     UserRegister,
+    ForgotPasswordRequest,
+    ResetPasswordRequest,
 )
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
 
 
-def register_user(db: Session, payload: UserRegister) -> UserRead:
+def register_user(
+    db: Session,
+    payload: UserRegister,
+    background_tasks: BackgroundTasks | None = None,
+) -> UserRead:
     existing = user_repository.get_by_email(db, payload.email)
     if existing:
         raise HTTPException(
@@ -42,7 +50,69 @@ def register_user(db: Session, payload: UserRegister) -> UserRead:
         role_id=3
     )
 
-    user = user_repository.create(db, user_create, password_hash=password_hash)
+    generated_token = secrets.token_urlsafe(32)
+
+    user = user_repository.create(
+        db,
+        user_create,
+        password_hash=password_hash,
+        token=generated_token,
+        confirmed=False,
+    )
+
+    # Construir URL de confirmación
+    confirm_url = f"http://127.0.0.1:9090/api/v1/auth/confirm?token={generated_token}"
+
+    # Generar contenido HTML y encolar el envío
+    email_content = get_action_email_template(
+        name=user.full_name,
+        title="Confirmación de Cuenta",
+        body_text="Gracias por registrarte en nuestra plataforma. Para completar tu registro y activar tu cuenta, por favor confirma tu dirección de correo electrónico haciendo clic en el siguiente botón:",
+        button_text="Confirmar mi Cuenta",
+        button_url=confirm_url,
+        secondary_text="Si no creaste esta cuenta, puedes ignorar este mensaje.",
+    )
+    
+    if background_tasks:
+        background_tasks.add_task(
+            send_email,
+            to_email=user.email,
+            subject="Confirma tu cuenta",
+            html_content=email_content,
+        )
+    else:
+        # Enviar síncronamente como fallback (ej. en scripts de prueba)
+        try:
+            send_email(
+                to_email=user.email,
+                subject="Confirma tu cuenta",
+                html_content=email_content,
+            )
+        except Exception:
+            # No detener el registro si falla el correo síncrono (ej. sin internet / mala config)
+            pass
+
+    return UserRead.model_validate(user)
+
+
+def confirm_user(db: Session, token: str) -> UserRead:
+    user = user_repository.get_by_token(db, token)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid or expired confirmation token",
+        )
+    if user.confirmed:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Account already confirmed",
+        )
+
+    user.confirmed = True
+    user.is_active = True
+    user.token = None  # Consumir el token
+    db.commit()
+    db.refresh(user)
     return UserRead.model_validate(user)
 
 
@@ -51,6 +121,12 @@ def login_user(db: Session, payload: UserLogin, request: Request | None = None) 
     if not user or not verify_password(payload.password, user.password_hash):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials"
+        )
+
+    if not user.confirmed:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Please confirm your email address to activate your account",
         )
 
     if not user.is_active:
@@ -184,3 +260,81 @@ def require_master(current_user: User = Depends(get_current_user)) -> User:
             detail="Only Master users can perform this action"
         )
     return current_user
+
+
+def request_password_reset(
+    db: Session,
+    payload: ForgotPasswordRequest,
+    background_tasks: BackgroundTasks | None = None,
+) -> None:
+    user = user_repository.get_by_email(db, payload.email)
+    if not user:
+        # Por seguridad y evitar la enumeración de emails, levantamos el mismo error genérico
+        # de "siempre y cuando haya sido confirmada y este activa".
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Password reset is only allowed for active and confirmed accounts."
+        )
+
+    if not user.confirmed or not user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Password reset is only allowed for active and confirmed accounts."
+        )
+
+    # Generar token seguro
+    reset_token = secrets.token_urlsafe(32)
+    user.token = reset_token
+    db.commit()
+
+    # URL de restablecimiento
+    reset_url = f"http://127.0.0.1:9090/api/v1/auth/reset-password?token={reset_token}"
+
+    email_content = get_action_email_template(
+        name=user.full_name,
+        title="Restablecer Contraseña",
+        body_text="Hemos recibido una solicitud para restablecer la contraseña de tu cuenta. Haz clic en el botón inferior para ingresar tu nueva contraseña:",
+        button_text="Restablecer Contraseña",
+        button_url=reset_url,
+        secondary_text="Si no solicitaste este cambio, puedes ignorar este mensaje de forma segura."
+    )
+
+    if background_tasks:
+        background_tasks.add_task(
+            send_email,
+            to_email=user.email,
+            subject="Restablece tu contraseña",
+            html_content=email_content,
+        )
+    else:
+        try:
+            send_email(
+                to_email=user.email,
+                subject="Restablece tu contraseña",
+                html_content=email_content,
+            )
+        except Exception:
+            pass
+
+
+def reset_password(db: Session, payload: ResetPasswordRequest) -> None:
+    user = user_repository.get_by_token(db, payload.token)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid or expired reset token"
+        )
+
+    if not user.confirmed or not user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Password reset is only allowed for active and confirmed accounts."
+        )
+
+    # Actualizar contraseña hasheada
+    user.password_hash = hash_password(payload.new_password)
+    user.token = None  # Consumir el token
+    db.commit()
+
+    # Revocar todas las sesiones del usuario como medida de seguridad corporativa premium
+    user_session_repository.revoke_all_user_sessions(db, user.id)

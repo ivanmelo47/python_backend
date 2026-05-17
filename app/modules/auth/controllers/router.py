@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Request, status
+from fastapi import APIRouter, Depends, Request, status, BackgroundTasks
 from sqlalchemy.orm import Session
 
 from app.common.response import success_response
@@ -12,18 +12,34 @@ from app.modules.users.schemas.user_schema import (
     UserLogin,
     UserRead,
     UserRegister,
+    ForgotPasswordRequest,
+    ResetPasswordRequest,
 )
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 
 @router.post("/register", response_model=None, status_code=status.HTTP_201_CREATED)
-def register(payload: UserRegister, db: Session = Depends(get_db)) -> dict:
-    data = auth_service.register_user(db, payload)
+def register(
+    payload: UserRegister,
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db),
+) -> dict:
+    data = auth_service.register_user(db, payload, background_tasks)
     return success_response(
         data=data,
-        msg="User registered successfully. Please wait for an administrator to activate your account.",
+        msg="User registered successfully. Please confirm your email address via the link sent to your inbox.",
         code=201
+    ).model_dump()
+
+
+@router.get("/confirm", response_model=None)
+def confirm(token: str, db: Session = Depends(get_db)) -> dict:
+    data = auth_service.confirm_user(db, token)
+    return success_response(
+        data=data,
+        msg="Your account has been successfully confirmed and activated!",
+        code=200
     ).model_dump()
 
 
@@ -69,4 +85,31 @@ def revoke_session(
     return success_response(
         data=UserSessionRead.model_validate(session),
         msg="Session revoked successfully"
+    ).model_dump()
+
+
+@router.post("/forgot-password", response_model=None)
+def forgot_password(
+    payload: ForgotPasswordRequest,
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db),
+) -> dict:
+    auth_service.request_password_reset(db, payload, background_tasks)
+    return success_response(
+        data=None,
+        msg="If the email belongs to an active, confirmed account, a password reset link has been sent.",
+        code=200
+    ).model_dump()
+
+
+@router.post("/reset-password", response_model=None)
+def reset_password(
+    payload: ResetPasswordRequest,
+    db: Session = Depends(get_db),
+) -> dict:
+    auth_service.reset_password(db, payload)
+    return success_response(
+        data=None,
+        msg="Your password has been successfully reset. All active sessions have been terminated for security.",
+        code=200
     ).model_dump()

@@ -14,13 +14,30 @@ def get_by_email(db: Session, email: str) -> User | None:
     return db.scalars(stmt).first()
 
 
+def get_by_token(db: Session, token: str) -> User | None:
+    stmt = select(User).where(User.token == token)
+    return db.scalars(stmt).first()
+
+
 def list_all(db: Session, *, skip: int = 0, limit: int = 100) -> list[User]:
     stmt = select(User).offset(skip).limit(limit)
     return list(db.scalars(stmt).all())
 
 
-def create(db: Session, payload: UserCreate, *, password_hash: str) -> User:
-    user = User(**payload.model_dump(exclude={"password"}), password_hash=password_hash)
+def create(
+    db: Session,
+    payload: UserCreate,
+    *,
+    password_hash: str,
+    token: str | None = None,
+    confirmed: bool = False,
+) -> User:
+    user = User(
+        **payload.model_dump(exclude={"password"}),
+        password_hash=password_hash,
+        token=token,
+        confirmed=confirmed,
+    )
     db.add(user)
     db.commit()
     db.refresh(user)

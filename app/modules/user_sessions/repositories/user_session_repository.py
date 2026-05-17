@@ -64,3 +64,16 @@ def get_sessions_by_user(db: Session, user_id: int) -> list[UserSession]:
         .order_by(UserSession.logged_in_at.desc())
         .all()
     )
+
+
+def revoke_all_user_sessions(db: Session, user_id: int) -> None:
+    """Revoca todas las sesiones activas de un usuario (ej. tras cambio de contraseña)."""
+    active_sessions = (
+        db.query(UserSession)
+        .filter(UserSession.user_id == user_id, UserSession.refresh_token_hash.isnot(None))
+        .all()
+    )
+    for session in active_sessions:
+        session.refresh_token_hash = None
+        session.logged_out_at = datetime.now(timezone.utc)
+    db.commit()

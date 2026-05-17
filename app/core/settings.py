@@ -37,6 +37,16 @@ class Settings(BaseSettings):
 
         return "sqlite:///./app.db"
 
+    # Email SMTP settings
+    mail_mailer: str = "smtp"
+    mail_scheme: str = "smtp"
+    mail_host: str = "localhost"
+    mail_port: int = 1025
+    mail_username: str | None = None
+    mail_password: str | None = None
+    mail_from_address: str | None = None
+    mail_from_name: str = "Python Backend API"
+
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
 

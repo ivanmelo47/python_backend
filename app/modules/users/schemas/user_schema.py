@@ -33,6 +33,7 @@ class UserUpdate(BaseModel):
 class UserRead(UserBase):
     id: int
     uuid: str
+    confirmed: bool
     created_at: datetime
     role: RoleRead | None = None
 
@@ -58,3 +59,12 @@ class AuthPayload(BaseModel):
 
 class TokenRefreshRequest(BaseModel):
     refresh_token: str
+
+
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr
+
+
+class ResetPasswordRequest(BaseModel):
+    token: str
+    new_password: str = Field(min_length=8, max_length=128)
