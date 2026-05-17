@@ -23,3 +23,4 @@ class User(Base):
 
     products = relationship("Product", back_populates="owner")
     role = relationship("Role", back_populates="users")
+    sessions = relationship("UserSession", back_populates="user", order_by="UserSession.logged_in_at.desc()")

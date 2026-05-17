@@ -10,6 +10,7 @@ from app.db.base import Base
 from app.modules.roles.models import role_model  # noqa: F401
 from app.modules.products.models import product_model  # noqa: F401
 from app.modules.users.models import user_model  # noqa: F401
+from app.modules.user_sessions.models import user_session_model  # noqa: F401
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
