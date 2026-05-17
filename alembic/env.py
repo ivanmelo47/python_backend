@@ -81,10 +81,17 @@ def run_migrations_online() -> None:
             target_metadata=target_metadata,
             compare_type=True,
             render_as_batch=render_as_batch,
+            # En MariaDB/MySQL el DDL es auto-commit, por lo que necesitamos
+            # hacer commit del registro de versión explícitamente.
+            transaction_per_migration=True,
         )
 
         with context.begin_transaction():
             context.run_migrations()
+
+        # Forzar commit para garantizar que alembic_version se persista en MariaDB
+        if database_url.startswith(("mariadb", "mysql")):
+            connection.execute(text("COMMIT"))
 
 
 if context.is_offline_mode():

@@ -16,6 +16,12 @@ class UserCreate(UserBase):
     password: str = Field(min_length=8, max_length=128)
 
 
+class UserRegister(BaseModel):
+    email: EmailStr
+    full_name: str
+    password: str = Field(min_length=8, max_length=128)
+
+
 class UserUpdate(BaseModel):
     email: EmailStr | None = None
     full_name: str | None = None
@@ -26,6 +32,7 @@ class UserUpdate(BaseModel):
 
 class UserRead(UserBase):
     id: int
+    uuid: str
     created_at: datetime
     role: RoleRead | None = None
 

@@ -58,9 +58,38 @@ Campos principales de user:
 
 ## Auth (JWT)
 
+- `POST /api/v1/auth/register`
 - `POST /api/v1/auth/login`
 - `POST /api/v1/auth/refresh`
 - `GET /api/v1/auth/me` (requiere Bearer token)
+
+Payload de registro:
+
+```json
+{
+  "email": "newuser@example.com",
+  "full_name": "New User",
+  "password": "strongpassword123"
+}
+```
+
+Respuesta (201 Created):
+
+```json
+{
+  "status": "success",
+  "code": 201,
+  "msg": "User registered successfully. Please wait for an administrator to activate your account.",
+  "data": {
+    "email": "newuser@example.com",
+    "full_name": "New User",
+    "is_active": false,
+    "role_id": 3,
+    "id": 2,
+    "created_at": "..."
+  }
+}
+```
 
 Payload de login:
 

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
 from app.common.response import success_response
@@ -8,9 +8,20 @@ from app.modules.users.schemas.user_schema import (
     TokenRefreshRequest,
     UserLogin,
     UserRead,
+    UserRegister,
 )
 
 router = APIRouter(prefix="/auth", tags=["auth"])
+
+
+@router.post("/register", response_model=None, status_code=status.HTTP_201_CREATED)
+def register(payload: UserRegister, db: Session = Depends(get_db)) -> dict:
+    data = auth_service.register_user(db, payload)
+    return success_response(
+        data=data, 
+        msg="User registered successfully. Please wait for an administrator to activate your account.", 
+        code=201
+    ).model_dump()
 
 
 @router.post("/login", response_model=None)
