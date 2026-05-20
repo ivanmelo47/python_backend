@@ -1,4 +1,6 @@
 import argparse
+import os
+import secrets
 import subprocess
 import sys
 
@@ -23,6 +25,40 @@ def clear_screen() -> None:
 
 def wait_for_continue() -> None:
     input("\nPresiona Enter para continuar...")
+
+
+def generate_jwt_secret() -> None:
+    new_key = secrets.token_hex(32)
+    print(f"\nNuevo JWT Secret Key generado: {new_key}")
+
+    env_path = ".env"
+    if os.path.exists(env_path):
+        try:
+            with open(env_path, "r", encoding="utf-8") as f:
+                lines = f.readlines()
+
+            key_found = False
+            for i, line in enumerate(lines):
+                if line.strip().startswith("JWT_SECRET_KEY="):
+                    newline = "\n" if line.endswith("\n") else ""
+                    lines[i] = f"JWT_SECRET_KEY={new_key}{newline}"
+                    key_found = True
+                    break
+
+            if not key_found:
+                if lines and not lines[-1].endswith("\n"):
+                    lines.append("\n")
+                lines.append(f"JWT_SECRET_KEY={new_key}\n")
+
+            with open(env_path, "w", encoding="utf-8") as f:
+                f.writelines(lines)
+
+            print(f"[OK] Se ha actualizado '{env_path}' con el nuevo JWT_SECRET_KEY.")
+        except Exception as exc:
+            print(f"[!] Error al actualizar el archivo '{env_path}': {exc}")
+    else:
+        print(f"[!] No se encontro el archivo '{env_path}'.")
+        print("Puedes copiar el valor de arriba y agregarlo a tu configuracion manualmente.")
 
 
 def run_app(*, host: str, port: int, reload_enabled: bool) -> None:
@@ -198,6 +234,7 @@ def show_main_menu() -> None:
         print("\n=== Manager Principal ===")
         print("1) Gestion de migraciones DB")
         print("2) Ejecutar app (host/puerto manual)")
+        print("3) Generar nuevo JWT Secret Key")
         print("0) Salir")
 
         opcion = input("Elige una opcion: ").strip()
@@ -208,6 +245,11 @@ def show_main_menu() -> None:
 
         if opcion == "2":
             show_app_menu()
+            continue
+
+        if opcion == "3":
+            generate_jwt_secret()
+            wait_for_continue()
             continue
 
         if opcion == "0":
@@ -241,6 +283,8 @@ def main() -> None:
     ejecutar_cmd.add_argument("--host", default="127.0.0.1", help="Host de escucha (default: 127.0.0.1)")
     ejecutar_cmd.add_argument("--puerto", type=int, default=8000, help="Puerto de escucha (default: 8000)")
     ejecutar_cmd.add_argument("--sin-reload", action="store_true", help="Deshabilitar reload automatico")
+
+    subparsers.add_parser("generar-jwt", aliases=["jwt", "secret-key"], help="Generar un nuevo JWT secret key y actualizar .env")
 
     args = parser.parse_args()
 
@@ -287,6 +331,10 @@ def main() -> None:
         if args.puerto < 1 or args.puerto > 65535:
             parser.error("El puerto debe estar entre 1 y 65535")
         run_app(host=args.host, port=args.puerto, reload_enabled=not args.sin_reload)
+        return
+
+    if args.command in {"generar-jwt", "jwt", "secret-key"}:
+        generate_jwt_secret()
         return
 
 

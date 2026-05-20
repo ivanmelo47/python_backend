@@ -150,6 +150,7 @@ Respuesta (200 OK):
 ```
 
 #### 2. Restablecer la contraseña usando el token
+*   **Expiración de Token**: El token de recuperación de contraseña tiene una validez estricta de **30 minutos** desde su generación. Al expirar, se deniega la petición y se limpia de la base de datos por seguridad.
 *   **Nota de Seguridad Premium**: Al restablecer con éxito la contraseña, **todas las sesiones activas anteriores del usuario se cierran automáticamente** invalidando sus refresh tokens.
 
 - `POST /api/v1/auth/reset-password`
@@ -159,7 +160,9 @@ Payload:
 ```json
 {
   "token": "R3Y9hKeM4jW...",
-  "new_password": "EvenStronger456!"
+  "new_password": "EvenStronger456!",
+  "latitude": 19.4326,       // Opcional
+  "longitude": -99.1332     // Opcional
 }
 ```
 

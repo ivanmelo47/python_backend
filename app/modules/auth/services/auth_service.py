@@ -1,4 +1,5 @@
 from fastapi import Depends, HTTPException, Request, status, BackgroundTasks
+from datetime import datetime, timezone, timedelta
 from fastapi.security import OAuth2PasswordBearer
 import secrets
 from sqlalchemy.orm import Session
@@ -11,9 +12,11 @@ from app.common.security.jwt_handler import (
 from app.common.security.password import hash_password, verify_password
 from app.common.security.token_hash import hash_token, verify_token_hash
 from app.common.mail.sender import send_email, get_action_email_template
+from app.core.settings import settings
 from app.db.session import get_db
 from app.modules.user_sessions.repositories import user_session_repository
 from app.modules.users.models.user_model import User
+from app.modules.users.models.password_reset_log_model import PasswordResetLog
 from app.modules.users.repositories import user_repository
 from app.modules.users.schemas.user_schema import (
     AuthPayload,
@@ -60,8 +63,8 @@ def register_user(
         confirmed=False,
     )
 
-    # Construir URL de confirmación
-    confirm_url = f"http://127.0.0.1:9090/api/v1/auth/confirm?token={generated_token}"
+    # Construir URL de confirmación (apuntando al Frontend)
+    confirm_url = f"{settings.frontend_url}/confirm?token={generated_token}"
 
     # Generar contenido HTML y encolar el envío
     email_content = get_action_email_template(
@@ -266,6 +269,7 @@ def request_password_reset(
     db: Session,
     payload: ForgotPasswordRequest,
     background_tasks: BackgroundTasks | None = None,
+    request: Request | None = None,
 ) -> None:
     user = user_repository.get_by_email(db, payload.email)
     if not user:
@@ -285,18 +289,36 @@ def request_password_reset(
     # Generar token seguro
     reset_token = secrets.token_urlsafe(32)
     user.token = reset_token
+    user.token_generated_at = datetime.now(timezone.utc)
+
+    # Extraer metadatos de auditoría
+    ip_address = None
+    user_agent = None
+    if request:
+        ip_address = request.client.host if request.client else None
+        user_agent = request.headers.get("user-agent")
+
+    # Registrar el intento en el log de auditoría
+    reset_log = PasswordResetLog(
+        user_id=user.id,
+        token=reset_token,
+        ip_address=ip_address,
+        user_agent=user_agent,
+        status="pending"
+    )
+    db.add(reset_log)
     db.commit()
 
-    # URL de restablecimiento
-    reset_url = f"http://127.0.0.1:9090/api/v1/auth/reset-password?token={reset_token}"
+    # URL de restablecimiento (apuntando al Frontend)
+    reset_url = f"{settings.frontend_url}/reset-password?token={reset_token}"
 
     email_content = get_action_email_template(
         name=user.full_name,
         title="Restablecer Contraseña",
-        body_text="Hemos recibido una solicitud para restablecer la contraseña de tu cuenta. Haz clic en el botón inferior para ingresar tu nueva contraseña:",
+        body_text="Hemos recibido una solicitud para restablecer la contraseña de tu cuenta. Haz clic en el botón inferior para ingresar tu nueva contraseña. Toma en cuenta que este enlace tiene una validez de 30 minutos:",
         button_text="Restablecer Contraseña",
         button_url=reset_url,
-        secondary_text="Si no solicitaste este cambio, puedes ignorar este mensaje de forma segura."
+        secondary_text="Este enlace expirará en 30 minutos por razones de seguridad. Si no solicitaste este cambio, puedes ignorar este mensaje de forma segura."
     )
 
     if background_tasks:
@@ -325,6 +347,35 @@ def reset_password(db: Session, payload: ResetPasswordRequest) -> None:
             detail="Invalid or expired reset token"
         )
 
+    # Validar si el token ha expirado (más de 30 minutos)
+    if not user.token_generated_at:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid or expired reset token"
+        )
+
+    token_time = user.token_generated_at
+    if token_time.tzinfo is None:
+        token_time = token_time.replace(tzinfo=timezone.utc)
+
+    time_elapsed = datetime.now(timezone.utc) - token_time
+    if time_elapsed > timedelta(minutes=30):
+        # Actualizar log a expirado
+        log_entry = db.query(PasswordResetLog).filter(PasswordResetLog.token == payload.token).first()
+        if log_entry:
+            log_entry.status = "expired"
+            log_entry.latitude = payload.latitude
+            log_entry.longitude = payload.longitude
+
+        # Limpiar token expirado por seguridad
+        user.token = None
+        user.token_generated_at = None
+        db.commit()
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid or expired reset token"
+        )
+
     if not user.confirmed or not user.is_active:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -334,6 +385,16 @@ def reset_password(db: Session, payload: ResetPasswordRequest) -> None:
     # Actualizar contraseña hasheada
     user.password_hash = hash_password(payload.new_password)
     user.token = None  # Consumir el token
+    user.token_generated_at = None
+
+    # Registrar completado en el log de auditoría
+    log_entry = db.query(PasswordResetLog).filter(PasswordResetLog.token == payload.token).first()
+    if log_entry:
+        log_entry.status = "completed"
+        log_entry.reset_at = datetime.now(timezone.utc)
+        log_entry.latitude = payload.latitude
+        log_entry.longitude = payload.longitude
+
     db.commit()
 
     # Revocar todas las sesiones del usuario como medida de seguridad corporativa premium

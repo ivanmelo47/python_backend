@@ -92,9 +92,10 @@ def revoke_session(
 def forgot_password(
     payload: ForgotPasswordRequest,
     background_tasks: BackgroundTasks,
+    request: Request,
     db: Session = Depends(get_db),
 ) -> dict:
-    auth_service.request_password_reset(db, payload, background_tasks)
+    auth_service.request_password_reset(db, payload, background_tasks, request=request)
     return success_response(
         data=None,
         msg="If the email belongs to an active, confirmed account, a password reset link has been sent.",

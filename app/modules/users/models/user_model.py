@@ -22,7 +22,9 @@ class User(Base):
     deleted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     token: Mapped[str | None] = mapped_column(String(255), unique=True, index=True, nullable=True)
     confirmed: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    token_generated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
     products = relationship("Product", back_populates="owner")
     role = relationship("Role", back_populates="users")
     sessions = relationship("UserSession", back_populates="user", order_by="UserSession.logged_in_at.desc()")
+    password_resets = relationship("PasswordResetLog", back_populates="user", cascade="all, delete-orphan")
