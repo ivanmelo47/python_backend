@@ -1,3 +1,12 @@
+.env.docker
+.env.docker.local
+__pycache__/
+*.pyc
+.venv/
+.env
+dist/
+build/
+*.egg-info
 # Environments
 .env
 .venv/

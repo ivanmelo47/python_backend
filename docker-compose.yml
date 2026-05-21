@@ -1,0 +1,35 @@
+version: '3.9'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: python_backend:latest
+    ports:
+      - "${APP_PORT}:8000"
+    env_file:
+      - .env.docker
+    environment:
+      - PYTHONUNBUFFERED=1
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
+    # On Docker Desktop (Windows / Mac) host.docker.internal resolves to host
+    # On Linux you can use network_mode: host (uncomment below) or configure host-gateway
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./:/app
+    command: uvicorn app.main:app --host 0.0.0.0 --port ${APP_PORT} --reload
+    # For Linux with direct host networking (containers share host network stack),
+    # uncomment the following line and remove ports mapping above.
+    # network_mode: host
+    networks:
+      - shared_services_network
+
+networks:
+  shared_services_network:
+    external: true

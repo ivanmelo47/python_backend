@@ -134,3 +134,60 @@ El menu interactivo permite elegir acciones numeradas por seccion sin recordar c
 La opcion de reinicio elimina y recrea la base de datos, por eso solo debe usarse cuando no necesitas conservar datos.
 
 Nota: La creacion de tablas ahora se controla por migraciones (Alembic), no por `create_all` en el arranque de la app.
+
+## Docker
+
+- Levantar en desarrollo (con hot-reload):
+
+```bash
+docker-compose up --build
+```
+
+Acceder a la API en: `http://localhost:8000` (docs en `/docs`).
+
+Para produccion, quite el `volumes` y el flag `--reload` en `docker-compose.yml` o ejecute la imagen directamente con `docker run`.
+
+Conexión a Base de Datos en el host local
+
+- En Docker Desktop (Windows / Mac) los contenedores pueden resolver el host con `host.docker.internal`. El `docker-compose.yml` ya incluye `extra_hosts` y un archivo de ejemplo `.env.docker.example`.
+- En Linux puedes usar `network_mode: host` (descomentar en `docker-compose.yml`) para que el contenedor comparta la red del host — atención: esto hace que los puertos estén en el host y puede no ser deseable en producción.
+
+Pasos recomendados:
+
+1. Copiar el ejemplo y editar credenciales:
+
+```bash
+cp .env.docker.example .env.docker
+# editar .env.docker -> poner DB_PASSWORD y demás datos reales
+```
+
+2. Levantar servicio:
+
+```bash
+docker-compose up --build
+```
+
+3. Si el contenedor no conecta a tu BD local, verifica:
+
+- Que el servidor de BD acepte conexiones desde la red (no sólo localhost/127.0.0.1).
+- En Windows/Mac con Docker Desktop, `DB_HOST=host.docker.internal` debería funcionar.
+- En Linux, considera `network_mode: host` o exponer la interfaz del servidor DB.
+
+Red compartida entre proyectos (opcional)
+
+Si tienes la base de datos levantada en otro `docker-compose` o en un stack con una red compartida, puedes conectar `web` a esa red para usar el nombre del servicio directamente (más seguro y sin exponer puertos).
+
+1. Asegúrate de que la red externa exista y se llame `shared_services_network` (o cambia el nombre en `docker-compose.yml`).
+
+2. En `.env.docker` pone `DB_HOST=db` (o el nombre del servicio de la base de datos en el otro `docker-compose`).
+
+3. Arranca tu stack de base de datos (el que contiene el servicio `db`) y luego en este proyecto ejecuta:
+
+```bash
+docker-compose up --build
+```
+
+Con esto el contenedor `web` resolverá `db` hacia el contenedor de la base de datos en la red compartida.
+
+
+
