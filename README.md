@@ -137,57 +137,104 @@ Nota: La creacion de tablas ahora se controla por migraciones (Alembic), no por 
 
 ## Docker
 
-- Levantar en desarrollo (con hot-reload):
+Este proyecto ya está preparado para desplegarse como **Stack de Portainer desde Git**.
 
-```bash
-docker-compose up --build
+### Cómo desplegarlo en Portainer
+
+1. En Portainer, ve a **Stacks** → **Add stack** → **Git repository**.
+2. Pega la URL del repositorio.
+3. Usa `docker-compose.yml` como archivo principal del stack.
+4. Carga las variables de entorno en la sección de **Environment variables**.
+5. Despliega el stack.
+
+### Variables que debes definir en Portainer
+
+La aplicación espera estas variables:
+
+- `APP_NAME`
+- `APP_VERSION`
+- `DEBUG`
+- `APP_TIMEZONE`
+- `JWT_SECRET_KEY`
+- `JWT_ALGORITHM`
+- `JWT_ACCESS_TOKEN_EXPIRE_MINUTES`
+- `JWT_REFRESH_TOKEN_EXPIRE_MINUTES`
+- `FRONTEND_URL`
+- `DB_SCHEME`
+- `DB_HOST`
+- `DB_PORT`
+- `DB_DATABASE`
+- `DB_USERNAME`
+- `DB_PASSWORD`
+- `DB_TIMEZONE`
+- `APP_PORT`
+- `MAIL_MAILER`
+- `MAIL_SCHEME`
+- `MAIL_HOST`
+- `MAIL_PORT`
+- `MAIL_USERNAME`
+- `MAIL_PASSWORD`
+- `MAIL_FROM_ADDRESS`
+- `MAIL_FROM_NAME`
+
+### Valores recomendados en VPS Ubuntu
+
+Si la base de datos está en el mismo servidor pero fuera de Docker:
+
+- `DB_HOST=host.docker.internal`
+- `DB_PORT=3306` o el puerto que expongas en el host
+
+Si la base de datos corre en otro contenedor y la conectas por una red Docker compartida:
+
+- `DB_HOST=db`
+- `DB_PORT=3306`
+
+Además, el stack `web` debe conectarse a la red externa `shared_services_network`, y el stack de la base de datos también debe estar unido a esa misma red.
+
+Si el nombre real de la red en tu VPS cambia, puedes definir `DOCKER_NETWORK_NAME` en Portainer y el stack usará ese valor en vez de `shared_services_network`.
+
+Si la base de datos está en otro servidor:
+
+- `DB_HOST=<ip-o-host-remoto>`
+- `DB_PORT=<puerto-remoto>`
+
+### Valores mínimos de ejemplo
+
+```text
+APP_NAME=Python Backend API
+APP_VERSION=1.0.0
+DEBUG=true
+APP_TIMEZONE=America/Mexico_City
+JWT_SECRET_KEY=change-me
+JWT_ALGORITHM=HS256
+JWT_ACCESS_TOKEN_EXPIRE_MINUTES=60
+JWT_REFRESH_TOKEN_EXPIRE_MINUTES=70
+FRONTEND_URL=http://localhost:3000
+DB_SCHEME=mariadb+mariadbconnector
+DB_HOST=host.docker.internal
+DB_PORT=3306
+DB_DATABASE=python_backend
+DB_USERNAME=root
+DB_PASSWORD=change-me
+DB_TIMEZONE=-06:00
+APP_PORT=8000
+MAIL_MAILER=smtp
+MAIL_SCHEME=smtp
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USERNAME=
+MAIL_PASSWORD=
+MAIL_FROM_ADDRESS=
+MAIL_FROM_NAME=Python Backend API
 ```
 
-Acceder a la API en: `http://localhost:8000` (docs en `/docs`).
-
-Para produccion, quite el `volumes` y el flag `--reload` en `docker-compose.yml` o ejecute la imagen directamente con `docker run`.
-
-Conexión a Base de Datos en el host local
-
-- En Docker Desktop (Windows / Mac) los contenedores pueden resolver el host con `host.docker.internal`. El `docker-compose.yml` ya incluye `extra_hosts` y un archivo de ejemplo `.env.docker.example`.
-- En Linux puedes usar `network_mode: host` (descomentar en `docker-compose.yml`) para que el contenedor comparta la red del host — atención: esto hace que los puertos estén en el host y puede no ser deseable en producción.
-
-Pasos recomendados:
-
-1. Copiar el ejemplo y editar credenciales:
+### Verificación
 
 ```bash
-cp .env.docker.example .env.docker
-# editar .env.docker -> poner DB_PASSWORD y demás datos reales
+docker compose ps
+docker compose logs -f web
+docker compose exec web python manage.py migrar
 ```
-
-2. Levantar servicio:
-
-```bash
-docker-compose up --build
-```
-
-3. Si el contenedor no conecta a tu BD local, verifica:
-
-- Que el servidor de BD acepte conexiones desde la red (no sólo localhost/127.0.0.1).
-- En Windows/Mac con Docker Desktop, `DB_HOST=host.docker.internal` debería funcionar.
-- En Linux, considera `network_mode: host` o exponer la interfaz del servidor DB.
-
-Red compartida entre proyectos (opcional)
-
-Si tienes la base de datos levantada en otro `docker-compose` o en un stack con una red compartida, puedes conectar `web` a esa red para usar el nombre del servicio directamente (más seguro y sin exponer puertos).
-
-1. Asegúrate de que la red externa exista y se llame `shared_services_network` (o cambia el nombre en `docker-compose.yml`).
-
-2. En `.env.docker` pone `DB_HOST=db` (o el nombre del servicio de la base de datos en el otro `docker-compose`).
-
-3. Arranca tu stack de base de datos (el que contiene el servicio `db`) y luego en este proyecto ejecuta:
-
-```bash
-docker-compose up --build
-```
-
-Con esto el contenedor `web` resolverá `db` hacia el contenedor de la base de datos en la red compartida.
 
 
 
