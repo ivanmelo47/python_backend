@@ -7,11 +7,11 @@ from sqlalchemy import text
 from alembic import context
 from app.core.settings import settings
 from app.db.base import Base
-from app.modules.roles.models import role_model  # noqa: F401
-from app.modules.products.models import product_model  # noqa: F401
-from app.modules.users.models import user_model  # noqa: F401
-from app.modules.users.models import password_reset_log_model  # noqa: F401
-from app.modules.user_sessions.models import user_session_model  # noqa: F401
+from app.models import role_model  # noqa: F401
+from app.models import product_model  # noqa: F401
+from app.models import user_model  # noqa: F401
+from app.models import password_reset_log_model  # noqa: F401
+from app.models import user_session_model  # noqa: F401
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

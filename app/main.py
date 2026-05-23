@@ -7,11 +7,11 @@ from app.api.router import api_router
 from app.common.response import error_response, success_response
 from app.core.settings import settings
 # Import models to ensure they are registered with SQLAlchemy Base
-from app.modules.roles.models import role_model  # noqa: F401
-from app.modules.users.models import user_model  # noqa: F401
-from app.modules.products.models import product_model  # noqa: F401
-from app.modules.user_sessions.models import user_session_model  # noqa: F401
-from app.modules.users.models import password_reset_log_model  # noqa: F401
+from app.models import role_model  # noqa: F401
+from app.models import user_model  # noqa: F401
+from app.models import product_model  # noqa: F401
+from app.models import user_session_model  # noqa: F401
+from app.models import password_reset_log_model  # noqa: F401
 
 
 app = FastAPI(
