@@ -38,6 +38,7 @@ class Settings(BaseSettings):
         return "sqlite:///./app.db"
 
     frontend_url: str = "http://localhost:3000"
+    app_port: int = 8000
 
     # Email SMTP settings
     mail_mailer: str = "smtp"

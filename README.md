@@ -56,6 +56,12 @@ python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 ```
 
+O puedes usar el script del proyecto:
+
+```powershell
+python create_venv.py
+```
+
 ## Instalar dependencias
 
 ```powershell
@@ -235,6 +241,27 @@ docker compose ps
 docker compose logs -f web
 docker compose exec web python manage.py migrar
 ```
+
+### Servicio en Ubuntu (systemd)
+
+Si quieres que la app nativa siga viva aunque cierres la terminal y que arranque sola después de reiniciar el VPS, instala un servicio `systemd`:
+
+```bash
+python deploy.py install-service --port 8000
+python deploy.py migrate-ubuntu
+python deploy.py status-service
+python deploy.py restart-service
+python deploy.py stop-service
+python deploy.py uninstall-service
+```
+
+El servicio usa el Python de `.venv`, no el Python global, y se configura para reiniciarse automáticamente si falla.
+
+Notas:
+
+- `install-service` es la opción para modo producción en Ubuntu.
+- `migrate-ubuntu` ejecuta las migraciones usando la `.venv` del proyecto en Ubuntu.
+- `reload` no es necesario en el servicio `systemd`; allí conviene reiniciar el servicio cuando hagas cambios.
 
 
 
