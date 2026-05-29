@@ -1,0 +1,284 @@
+// ============================================
+// ALERT SYSTEM STYLES (Modals & Toasts)
+// ============================================
+
+@use "sass:map";
+@use '../shared/variables' as *;
+@use '../shared/mixins' as *;
+
+// --------------------------------------------
+// 1. Toast Container (Top Right)
+// --------------------------------------------
+.toast-container {
+    position: fixed;
+    top: get-spacing(6);
+    right: get-spacing(6);
+    z-index: 9999;
+    /* Force top (above navbar z-index: 10) */
+    display: flex;
+    flex-direction: column;
+    gap: get-spacing(3);
+    pointer-events: none; // Allow clicks through container
+    width: 350px;
+    max-width: calc(100vw - 2rem);
+
+    // Reset pointer events for children
+    .toast-item {
+        pointer-events: auto;
+    }
+}
+
+// --------------------------------------------
+// 2. Toast Styling
+// --------------------------------------------
+.toast-item {
+    @include card(get-spacing(4));
+    display: flex;
+    align-items: center;
+    gap: get-spacing(3);
+    box-shadow: map.get($shadows, lg);
+    border-left: 4px solid transparent;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+
+    // Status Variants
+    &.success {
+        border-left-color: get-color(success);
+
+        .icon-wrapper {
+            color: get-color(success);
+        }
+    }
+
+    &.error {
+        border-left-color: get-color(error);
+
+        .icon-wrapper {
+            color: get-color(error);
+        }
+    }
+
+    &.warning {
+        border-left-color: get-color(warning);
+
+        .icon-wrapper {
+            color: get-color(warning);
+        }
+    }
+
+    &.info {
+        border-left-color: get-color(info);
+
+        .icon-wrapper {
+            color: get-color(info);
+        }
+    }
+
+    // Content
+    .toast-content {
+        flex: 1;
+
+        h4 {
+            font-size: get-font-size(sm);
+            font-weight: map.get($font-weights, semibold);
+            margin: 0;
+            color: var(--text-primary);
+        }
+
+        p {
+            font-size: get-font-size(xs);
+            margin: get-spacing(1) 0 0;
+            color: var(--text-secondary);
+        }
+    }
+
+    // Close Button
+    .toast-close {
+        background: none;
+        border: none;
+        color: var(--text-tertiary);
+        cursor: pointer;
+        padding: get-spacing(1);
+        @include transition(color);
+
+        &:hover {
+            color: var(--text-primary);
+        }
+    }
+}
+
+// --------------------------------------------
+// 3. Modal Overlay (Centered)
+// --------------------------------------------
+.alert-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    z-index: 12000;
+    @include flex-center;
+    padding: get-spacing(4);
+}
+
+// --------------------------------------------
+// 4. Modal Styling
+// --------------------------------------------
+.alert-modal {
+    @include card(get-spacing(8));
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: map.get($shadows, xl);
+
+    // Modal Icon
+    .modal-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: map.get($radius, full);
+        @include flex-center;
+        margin: 0 auto get-spacing(4);
+        font-size: get-font-size(4xl);
+        position: relative;
+
+        &.success {
+            background: rgba(get-color(success), 0.1);
+            color: get-color(success);
+            border: 2px solid rgba(get-color(success), 0.2);
+        }
+
+        &.error {
+            background: rgba(get-color(error), 0.1);
+            color: get-color(error);
+            border: 2px solid rgba(get-color(error), 0.2);
+        }
+
+        &.warning {
+            background: rgba(get-color(warning), 0.1);
+            color: get-color(warning);
+            border: 2px solid rgba(get-color(warning), 0.2);
+        }
+
+        &.info {
+            background: rgba(get-color(info), 0.1);
+            color: get-color(info);
+            border: 2px solid rgba(get-color(info), 0.2);
+        }
+    }
+
+    h2 {
+        font-size: get-font-size(xl);
+        margin-bottom: get-spacing(2);
+        color: var(--text-primary);
+    }
+
+    p {
+        color: var(--text-secondary);
+        margin-bottom: get-spacing(6);
+    }
+
+    // Buttons container
+    .modal-actions {
+        display: flex;
+        gap: get-spacing(3);
+        justify-content: center;
+
+        button {
+            flex: 0 0 140px;
+            width: 140px;
+            min-width: 140px;
+            height: 44px;
+            min-height: 44px;
+            box-sizing: border-box;
+            white-space: nowrap;
+            transition: all 0.2s ease;
+
+            &:hover {
+                transform: translateY(-1px);
+            }
+
+            &:active {
+                transform: translateY(0);
+            }
+
+            &.btn-confirm {
+                @include button-base;
+                background: var(--primary);
+                color: white;
+                border: 1px solid var(--primary);
+                box-shadow: 0 6px 14px -8px var(--shadow-color);
+
+                &:hover {
+                    filter: brightness(1.05);
+                    box-shadow: 0 10px 16px -10px var(--shadow-color);
+                }
+            }
+
+            &.btn-cancel {
+                @include button-base;
+                background: var(--bg-secondary);
+                color: var(--text-primary);
+                border: 1px solid var(--border-color);
+
+                &:hover {
+                    background: var(--bg-tertiary);
+                    border-color: var(--text-tertiary);
+                }
+            }
+
+            &.btn-neutral {
+                @include button-base;
+                background: var(--bg-secondary);
+                color: var(--primary);
+                border: 1px solid var(--primary);
+
+                &:hover {
+                    background: var(--bg-tertiary);
+                    filter: brightness(1.03);
+                }
+            }
+        }
+    }
+}
+
+// --------------------------------------------
+// 5. Animations
+// --------------------------------------------
+
+// Toast Transitions
+.toast-enter-active,
+.toast-leave-active {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.toast-enter-from {
+    opacity: 0;
+    transform: translateX(30px);
+}
+
+.toast-leave-to {
+    opacity: 0;
+    transform: translateX(30px);
+}
+
+// Modal Transitions
+.modal-enter-active,
+.modal-leave-active {
+    transition: opacity 0.3s ease;
+
+    .alert-modal {
+        transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+}
+
+.modal-enter-from,
+.modal-leave-to {
+    opacity: 0;
+
+    .alert-modal {
+        transform: scale(0.9) translateY(10px);
+    }
+}

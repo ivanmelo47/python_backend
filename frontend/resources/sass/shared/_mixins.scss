@@ -1,0 +1,189 @@
+// ============================================
+// SHARED MIXINS - Reusable across Landing & Private
+// ============================================
+
+@use "sass:map";
+@use "sass:list";
+@use '../shared/variables' as *;
+
+// Flexbox helpers
+@mixin flex-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+@mixin flex-between {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+@mixin flex-column {
+    display: flex;
+    flex-direction: column;
+}
+
+// Responsive breakpoints
+@mixin respond-to($breakpoint) {
+    @if map.has-key($breakpoints, $breakpoint) {
+        @media (min-width: map.get($breakpoints, $breakpoint)) {
+            @content;
+        }
+    }
+}
+
+// Card style
+@mixin card($padding: get-spacing(6)) {
+    background: var(--bg-primary);
+    border-radius: map.get($radius, xl);
+    box-shadow: map.get($shadows, md);
+    padding: $padding;
+    transition: map.get($transitions, base);
+
+    &:hover {
+        box-shadow: map.get($shadows, lg);
+    }
+}
+
+// Button base
+@mixin button-base {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: get-spacing(2);
+    padding: get-spacing(3) get-spacing(6);
+    border: none;
+    border-radius: map.get($radius, md);
+    font-size: get-font-size(base);
+    font-weight: map.get($font-weights, medium);
+    cursor: pointer;
+    transition: map.get($transitions, base);
+    text-decoration: none;
+
+    &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+}
+
+// Input field
+@mixin input-field {
+    width: 100%;
+    padding: get-spacing(3) get-spacing(4);
+    border: 2px solid var(--border-color);
+    border-radius: map.get($radius, md);
+    font-size: get-font-size(base);
+    color: var(--text-primary);
+    background: var(--bg-primary);
+    transition: map.get($transitions, base);
+
+    &:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(get-color(primary), 0.1);
+    }
+
+    &::placeholder {
+        color: var(--text-tertiary);
+    }
+}
+
+// Truncate text
+@mixin truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+// Line clamp
+@mixin line-clamp($lines: 2) {
+    display: -webkit-box;
+    -webkit-line-clamp: $lines;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+// Absolute center
+@mixin absolute-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+// Animation
+@mixin animation($name, $duration: 0.3s, $timing: ease) {
+    animation: $name $duration $timing;
+}
+
+// Gradient background
+@mixin gradient-bg($start, $end, $angle: 135deg) {
+    background: linear-gradient($angle, $start 0%, $end 100%);
+}
+
+// Glassmorphism effect
+@mixin glass {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+// Dark mode glass
+@mixin glass-dark {
+    background: rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+// Transition helper
+@mixin transition($properties...) {
+    $result: (
+    );
+
+@each $property in $properties {
+    $result: list.append($result, #{$property} 0.3s ease, comma);
+}
+
+transition: $result;
+}
+
+// Hide scrollbar
+@mixin hide-scrollbar {
+    &::-webkit-scrollbar {
+        display: none;
+    }
+
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+// Custom scrollbar
+@mixin custom-scrollbar($width: 8px) {
+    &::-webkit-scrollbar {
+        width: $width !important;
+        height: $width !important;
+        display: block !important;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: rgba(var(--bg-tertiary-rgb), 0.1) !important;
+        border-radius: 100px !important;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: var(--bg-tertiary) !important;
+        border-radius: 100px !important;
+        border: 2px solid transparent !important;
+        background-clip: padding-box !important;
+
+        &:hover {
+            background: var(--primary) !important;
+            background-clip: padding-box !important;
+        }
+    }
+
+    // Firefox
+    scrollbar-width: thin;
+    scrollbar-color: var(--bg-tertiary) transparent;
+}

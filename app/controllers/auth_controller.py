@@ -28,7 +28,7 @@ def register(
     data = auth_service.register_user(db, payload, background_tasks)
     return success_response(
         data=data,
-        msg="User registered successfully. Please confirm your email address via the link sent to your inbox.",
+        message="User registered successfully. Please confirm your email address via the link sent to your inbox.",
         code=201
     ).model_dump()
 
@@ -38,7 +38,7 @@ def confirm(token: str, db: Session = Depends(get_db)) -> dict:
     data = auth_service.confirm_user(db, token)
     return success_response(
         data=data,
-        msg="Your account has been successfully confirmed and activated!",
+        message="Your account has been successfully confirmed and activated!",
         code=200
     ).model_dump()
 
@@ -46,14 +46,14 @@ def confirm(token: str, db: Session = Depends(get_db)) -> dict:
 @router.post("/login", response_model=None)
 def login(payload: UserLogin, request: Request, db: Session = Depends(get_db)) -> dict:
     data = auth_service.login_user(db, payload, request)
-    return success_response(data=data, msg="Login successful", code=200).model_dump()
+    return success_response(data=data, message="Login successful", code=200).model_dump()
 
 
 @router.post("/refresh", response_model=None)
 def refresh(payload: TokenRefreshRequest, db: Session = Depends(get_db)) -> dict:
     data = auth_service.refresh_token_data(db, payload.refresh_token)
     return success_response(
-        data=data, msg="Token refreshed successfuly", code=200
+        data=data, message="Token refreshed successfuly", code=200
     ).model_dump()
 
 
@@ -69,7 +69,7 @@ def get_sessions(
 ) -> dict:
     sessions = user_session_repository.get_sessions_by_user(db, current_user.id)
     data = [UserSessionRead.model_validate(s) for s in sessions]
-    return success_response(data=data, msg="Sessions retrieved").model_dump()
+    return success_response(data=data, message="Sessions retrieved").model_dump()
 
 
 @router.delete("/sessions/{session_uuid}", response_model=None)
@@ -84,7 +84,7 @@ def revoke_session(
         raise HTTPException(status_code=404, detail="Session not found or already revoked")
     return success_response(
         data=UserSessionRead.model_validate(session),
-        msg="Session revoked successfully"
+        message="Session revoked successfully"
     ).model_dump()
 
 
@@ -98,7 +98,7 @@ def forgot_password(
     auth_service.request_password_reset(db, payload, background_tasks, request=request)
     return success_response(
         data=None,
-        msg="If the email belongs to an active, confirmed account, a password reset link has been sent.",
+        message="If the email belongs to an active, confirmed account, a password reset link has been sent.",
         code=200
     ).model_dump()
 
@@ -111,6 +111,6 @@ def reset_password(
     auth_service.reset_password(db, payload)
     return success_response(
         data=None,
-        msg="Your password has been successfully reset. All active sessions have been terminated for security.",
+        message="Your password has been successfully reset. All active sessions have been terminated for security.",
         code=200
     ).model_dump()

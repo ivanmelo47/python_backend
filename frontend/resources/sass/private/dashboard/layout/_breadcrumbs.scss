@@ -1,0 +1,58 @@
+@use "sass:map";
+@use "../../../shared/variables" as *;
+@use "../../../shared/mixins" as *;
+
+.breadcrumbs-nav {
+    padding: get-spacing(3) get-spacing(6);
+    background: var(--bg-tertiary);
+    border-bottom: 1px solid var(--border-color);
+    flex-shrink: 0;
+    margin: 0;
+
+    @media (max-width: 768px) {
+        padding: get-spacing(2) get-spacing(3);
+    }
+
+    .breadcrumbs-list {
+        display: flex;
+        align-items: center;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        gap: get-spacing(3);
+        font-size: get-font-size(sm);
+        color: var(--text-tertiary);
+    }
+
+    .breadcrumb-item {
+        display: flex;
+        align-items: center;
+        gap: get-spacing(3);
+
+        .home-link,
+        .breadcrumb-link {
+            color: var(--text-tertiary);
+            text-decoration: none;
+            @include transition(color, transform);
+            display: flex;
+            align-items: center;
+
+            &:hover {
+                color: var(--primary);
+                transform: translateY(-1px);
+            }
+        }
+
+        .separator {
+            color: var(--text-tertiary);
+            font-weight: map.get($font-weights, medium);
+            opacity: 0.8;
+            font-size: 1.1em;
+        }
+
+        .breadcrumb-current {
+            color: var(--text-primary);
+            font-weight: map.get($font-weights, semibold);
+        }
+    }
+}

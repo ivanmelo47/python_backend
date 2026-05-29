@@ -1,0 +1,525 @@
+// ============================================
+// LANDING PAGE STYLES
+// ============================================
+
+@use "sass:map";
+@use "sass:math";
+@use "../shared/variables" as *;
+@use "../shared/premium-cards";
+@use "../shared/mixins" as *;
+@use "master-login";
+
+// Aero-Premium Public Design System
+$aero-blur: 24px;
+$aero-border: rgba(255, 255, 255, 0.1);
+$aero-surface: rgba(15, 18, 24, 0.75);
+$aero-accent: #5ce8bf; // Palette emerald
+$aero-gradient-primary: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+$aero-glow-emerald: 0 0 30px rgba(92, 232, 191, 0.15);
+
+@keyframes aero-plasma {
+    0% { transform: scale(1) translate(0, 0) rotate(0deg); }
+    33% { transform: scale(1.2) translate(5%, 5%) rotate(120deg); }
+    66% { transform: scale(0.9) translate(-5%, 8%) rotate(240deg); }
+    100% { transform: scale(1) translate(0, 0) rotate(360deg); }
+}
+
+@keyframes aero-reveal {
+    from { opacity: 0; transform: translateY(30px); filter: blur(10px); }
+    to { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+
+// Landing specific variables
+$landing-gradient-start: get-color(accent);
+$landing-gradient-end: #764ba2;
+
+// Navigation
+.landing-nav {
+    background: var(--bg-primary);
+    box-shadow: map.get($shadows, sm);
+    padding: get-spacing(4) get-spacing(6);
+    position: sticky;
+    top: 0;
+    z-index: map.get($z-index, sticky);
+    border-bottom: 1px solid var(--border-color);
+
+    ul {
+        list-style: none;
+        @include flex-between;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0;
+
+        li {
+            a {
+                padding: get-spacing(2) get-spacing(4);
+                border-radius: map.get($radius, md);
+                font-weight: map.get($font-weights, medium);
+                @include transition(background, color);
+
+                &:hover {
+                    background: var(--bg-secondary);
+                }
+
+                &.router-link-active {
+                    color: var(--primary);
+                    background: var(--bg-secondary);
+                }
+            }
+        }
+    }
+}
+
+// Hero section
+.landing-hero {
+    @include gradient-bg($landing-gradient-start, $landing-gradient-end);
+    min-height: 100vh;
+    @include flex-center;
+    padding: get-spacing(12) get-spacing(6);
+    text-align: center;
+    color: white;
+
+    h1 {
+        font-size: get-font-size(6xl);
+        margin-bottom: get-spacing(6);
+        color: white;
+
+        @include respond-to(md) {
+            font-size: get-font-size(5xl);
+        }
+    }
+
+    p {
+        font-size: get-font-size(xl);
+        max-width: 600px;
+        margin: 0 auto get-spacing(8);
+        color: rgba(255, 255, 255, 0.9);
+    }
+}
+
+// Feature cards
+.landing-features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: get-spacing(6);
+    padding: get-spacing(8) get-spacing(6);
+    max-width: 1200px;
+    margin: 0 auto;
+
+    .feature-card {
+        @include card;
+        text-align: center;
+
+        .icon {
+            font-size: get-font-size(5xl);
+            margin-bottom: get-spacing(4);
+        }
+
+        h3 {
+            color: var(--text-primary);
+            margin-bottom: get-spacing(3);
+        }
+
+        p {
+            color: var(--text-secondary);
+            margin-bottom: 0;
+        }
+    }
+}
+
+// Container
+.landing-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: get-spacing(6);
+}
+
+// CTA buttons
+.landing-cta {
+    @include button-base;
+    background: get-color(primary);
+    color: white;
+    padding: get-spacing(4) get-spacing(8);
+    font-size: get-font-size(lg);
+    border-radius: map.get($radius, lg);
+    box-shadow: map.get($shadows, md);
+
+    &:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: map.get($shadows, lg);
+    }
+
+    &:active:not(:disabled) {
+        transform: translateY(0);
+    }
+}
+
+// Login form specific
+// Login form specific
+.login-layout {
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+
+    .landing-nav {
+        flex-shrink: 0; // Navbar never shrinks
+        width: 100%;
+        z-index: 10;
+    }
+}
+
+.login-container {
+    flex: 1;
+    height: auto;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: get-spacing(4);
+    @include gradient-bg($landing-gradient-start, $landing-gradient-end);
+    overflow-y: auto;
+
+    @include respond-to(md) {
+        display: grid;
+        grid-template-columns: repeat(
+            12,
+            1fr
+        ); // 12 columns for perfect 1-6 centering
+        gap: get-spacing(4);
+        padding: get-spacing(8);
+        align-items: center;
+    }
+}
+
+.login-card {
+    @include card(get-spacing(8));
+    width: 100%;
+    min-width: 320px;
+    animation: slideUp 0.5s ease-out;
+    max-height: 90vh;
+    overflow-y: auto;
+    @include custom-scrollbar;
+    grid-column: 1 / -1; // Mobile: full width
+
+    // Base widths on Desktop (1-6 units, each unit = 2 cols)
+    @include respond-to(md) {
+        @for $i from 1 through 6 {
+            $span: $i * 2;
+
+            &.width-#{$i} {
+                grid-column: span #{$span};
+                max-width: #{350px + ($i * 150px)};
+
+                @if $i ==6 {
+                    max-width: none;
+                }
+            }
+
+            // Alignment logic for 12-column grid
+            &.align-left {
+                &.width-#{$i} {
+                    grid-column: 1 / span #{$span};
+                }
+
+                justify-self: start;
+            }
+
+            &.align-right {
+                &.width-#{$i} {
+                    $start: 13 - $span;
+                    grid-column: #{$start} / span #{$span};
+                }
+
+                justify-self: end;
+            }
+
+            &.align-center {
+                justify-self: center;
+
+                &.width-#{$i} {
+                    $start: math.div(12 - $span, 2) + 1;
+                    grid-column: #{$start} / span #{$span};
+                }
+            }
+        }
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.login-header {
+    text-align: center;
+    margin-bottom: get-spacing(6);
+
+    h1 {
+        font-size: get-font-size(3xl);
+        margin-bottom: get-spacing(2);
+    }
+
+    p {
+        color: var(--text-secondary);
+        font-size: get-font-size(sm);
+        margin-bottom: 0;
+    }
+}
+
+.login-form {
+    display: grid;
+    grid-template-columns: 1fr; // Mobile first: 1 column
+    gap: 0 get-spacing(4);
+
+    @include respond-to(md) {
+        grid-template-columns: repeat(
+            6,
+            1fr
+        ); // 6-column grid for max flexibility (2, 3 cols)
+    }
+}
+
+.form-group {
+    margin-bottom: get-spacing(1);
+    display: flex;
+    flex-direction: column;
+    grid-column: 1 / -1; // Default span full width on mobile
+
+    &.col-span-6 {
+        @include respond-to(md) {
+            grid-column: span 6;
+        }
+    }
+
+    &.col-span-3 {
+        @include respond-to(md) {
+            grid-column: span 3;
+        }
+    }
+
+    &.col-span-2 {
+        @include respond-to(md) {
+            grid-column: span 2;
+        }
+    }
+
+    &.centered {
+        label {
+            justify-content: center;
+        }
+
+        input {
+            text-align: center;
+        }
+    }
+
+    label {
+        display: flex;
+        align-items: center;
+        gap: get-spacing(2);
+        margin-bottom: get-spacing(2);
+        color: var(--text-primary);
+        font-weight: map.get($font-weights, medium);
+
+        .icon {
+            font-size: get-font-size(lg);
+        }
+    }
+
+    input[type="email"],
+    input[type="password"],
+    input[type="text"] {
+        @include input-field;
+    }
+
+    .error {
+        display: block;
+        color: get-color(error);
+        font-size: get-font-size(sm);
+        min-height: get-spacing(
+            5
+        ); // Reserve enough space for one line + margin
+        margin-top: get-spacing(1);
+        line-height: 1.2;
+        @include transition(opacity);
+
+        &:empty {
+            opacity: 0;
+            user-select: none;
+        }
+    }
+}
+
+.password-wrapper {
+    position: relative;
+
+    input {
+        padding-right: get-spacing(12);
+    }
+
+    .toggle-password {
+        position: absolute;
+        right: get-spacing(3);
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: var(--text-secondary);
+        font-size: get-font-size(xl);
+        padding: get-spacing(1);
+        @include transition(opacity, color);
+
+        &:hover {
+            opacity: 0.7;
+            color: var(--primary);
+        }
+    }
+}
+
+.btn-primary {
+    @include button-base;
+    grid-column: 1 / -1; // Always full width in grid
+    width: 100%;
+    padding: get-spacing(4);
+    background: linear-gradient(
+        135deg,
+        get-color(primary) 0%,
+        get-color(primary-dark) 100%
+    );
+    color: white;
+    font-size: get-font-size(lg);
+    font-weight: map.get($font-weights, semibold);
+    margin-top: get-spacing(4);
+    box-shadow: map.get($shadows, md);
+
+    &:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: map.get($shadows, lg);
+    }
+}
+
+.message {
+    grid-column: 1 / -1; // Always full width
+    margin-top: get-spacing(4);
+    padding: get-spacing(3);
+    border-radius: map.get($radius, md);
+    text-align: center;
+    font-weight: map.get($font-weights, medium);
+
+    &.success {
+        background: rgba(get-color(success), 0.1);
+        color: get-color(success);
+        border: 1px solid rgba(get-color(success), 0.3);
+    }
+
+    &.error {
+        background: rgba(get-color(error), 0.1);
+        color: get-color(error);
+        border: 1px solid rgba(get-color(error), 0.3);
+    }
+}
+
+.login-footer {
+    margin-top: get-spacing(6);
+    text-align: center;
+
+    .link {
+        color: var(--primary);
+        font-weight: map.get($font-weights, medium);
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+
+    .divider {
+        margin: get-spacing(4) 0;
+        color: var(--text-tertiary);
+        position: relative;
+
+        &::before,
+        &::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            width: 40%;
+            height: 1px;
+            background: var(--border-color);
+        }
+
+        &::before {
+            left: 0;
+        }
+
+        &::after {
+            right: 0;
+        }
+    }
+
+    p {
+        color: var(--text-secondary);
+        margin: get-spacing(4) 0 0;
+    }
+}
+
+// Additional login component specific styles
+.login-header {
+    h1 {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: get-spacing(3);
+        font-size: get-font-size(3xl);
+        margin-bottom: get-spacing(2);
+    }
+}
+
+.label-icon {
+    color: var(--primary);
+}
+
+.checkbox-group {
+    .checkbox-label {
+        display: flex;
+        align-items: center;
+        gap: get-spacing(2);
+        cursor: pointer;
+        font-weight: map.get($font-weights, normal);
+
+        input[type="checkbox"] {
+            width: auto;
+            cursor: pointer;
+            transform: scale(1.2);
+        }
+    }
+}
+
+
+.btn-primary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: get-spacing(2);
+}
+
+.message {
+    display: flex;
+    align-items: center;
+    gap: get-spacing(2);
+    justify-content: center;
+}
+
+.toggle-password {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

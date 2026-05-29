@@ -8,15 +8,15 @@ T = TypeVar("T")
 class StandardResponse(BaseModel, Generic[T]):
     status: str
     code: int
-    msg: str
+    message: str
     data: T | None = None
 
     model_config = ConfigDict(from_attributes=True)
 
 
-def success_response(data: T | None = None, *, msg: str = "OK", code: int = 200) -> StandardResponse[T]:
-    return StandardResponse(status="success", code=code, msg=msg, data=data)
+def success_response(data: T | None = None, *, message: str = "OK", code: int = 200) -> StandardResponse[T]:
+    return StandardResponse(status="success", code=code, message=message, data=data)
 
 
-def error_response(*, msg: str, code: int) -> StandardResponse[None]:
-    return StandardResponse(status="error", code=code, msg=msg, data=None)
+def error_response(*, message: str, code: int) -> StandardResponse[None]:
+    return StandardResponse(status="error", code=code, message=message, data=None)

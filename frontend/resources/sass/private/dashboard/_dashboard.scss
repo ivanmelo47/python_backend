@@ -1,0 +1,9 @@
+// Dashboard layout styles entrypoint (modularized)
+@use "layout/base";
+@use "layout/sidebar";
+@use "layout/header";
+@use "layout/search";
+@use "layout/breadcrumbs";
+@use "layout/content";
+@use "layout/shortcuts";
+@use "layout/fit-footer";

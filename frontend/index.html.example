@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f6f1e8">
+    <title>Plataforma Frontend</title>
+    <style>
+        .app-initial-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #10141d;
+            z-index: 9999;
+            transition: opacity 0.4s ease;
+        }
+
+        .loader-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top: 3px solid #ffb300;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+            box-shadow: 0 0 15px rgba(255, 179, 0, 0.2);
+        }
+
+        .loader-text {
+            color: #ffffff;
+            font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+            font-size: 14px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            opacity: 0.8;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes pulse {
+            0%,
+            100% {
+                opacity: 0.4;
+            }
+
+            50% {
+                opacity: 0.8;
+            }
+        }
+    </style>
+    <script type="module" src="/resources/js/app.js"></script>
+</head>
+<body>
+    <div id="app">
+        <div class="app-initial-loader">
+            <div class="loader-spinner"></div>
+            <div class="loader-text">Cargando...</div>
+        </div>
+    </div>
+</body>
+</html>

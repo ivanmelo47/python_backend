@@ -121,6 +121,50 @@ def run_app(*, host: str, port: int, reload_enabled: bool) -> None:
     subprocess.run(args, check=True)
 
 
+def run_frontend() -> None:
+    frontend_dir = ROOT / "frontend"
+    if not frontend_dir.exists():
+        print("[!] No se encontro la carpeta 'frontend'.")
+        return
+    
+    npm_cmd = "npm.cmd" if os.name == "nt" else "npm"
+    try:
+        subprocess.run([npm_cmd, "run", "dev"], cwd=frontend_dir, check=True)
+    except FileNotFoundError:
+        print("[!] Node.js o npm no estan instalados o no estan en el PATH.")
+    except KeyboardInterrupt:
+        pass
+
+
+def run_fullstack(*, host: str, port: int, reload_enabled: bool) -> None:
+    frontend_dir = ROOT / "frontend"
+    if not frontend_dir.exists():
+        print("[!] No se encontro la carpeta 'frontend'. Solo se iniciara el backend.")
+        run_app(host=host, port=port, reload_enabled=reload_enabled)
+        return
+
+    npm_cmd = "npm.cmd" if os.name == "nt" else "npm"
+    
+    print("[INFO] Iniciando Frontend (Vue) y Backend (FastAPI)...")
+    
+    backend_args = [sys.executable, "-m", "uvicorn", "app.main:app", "--host", host, "--port", str(port)]
+    if reload_enabled:
+        backend_args.append("--reload")
+        
+    try:
+        backend_process = subprocess.Popen(backend_args)
+        frontend_process = subprocess.Popen([npm_cmd, "run", "dev"], cwd=frontend_dir)
+        
+        backend_process.wait()
+        frontend_process.wait()
+    except KeyboardInterrupt:
+        print("\n[INFO] Deteniendo servidores...")
+        backend_process.terminate()
+        frontend_process.terminate()
+        backend_process.wait()
+        frontend_process.wait()
+
+
 def reset_database() -> None:
     if not all([settings.db_host, settings.db_port, settings.db_database, settings.db_username, settings.db_password]):
         raise RuntimeError("Faltan credenciales DB_* para reiniciar la base de datos.")
@@ -286,8 +330,10 @@ def show_main_menu() -> None:
         clear_screen()
         print("\n=== Manager Principal ===")
         print("1) Gestion de migraciones DB")
-        print("2) Ejecutar app (host/puerto manual)")
+        print("2) Ejecutar app (backend manual)")
         print("3) Generar nuevo JWT Secret Key")
+        print("4) Arrancar frontend (Vue)")
+        print("5) Arrancar Fullstack (FastAPI + Vue)")
         print("0) Salir")
 
         opcion = input("Elige una opcion: ").strip()
@@ -303,6 +349,24 @@ def show_main_menu() -> None:
         if opcion == "3":
             generate_jwt_secret()
             wait_for_continue()
+            continue
+
+        if opcion == "4":
+            run_frontend()
+            continue
+
+        if opcion == "5":
+            clear_screen()
+            print("\n=== Arrancar Fullstack ===")
+            host = input("Host (default 127.0.0.1): ").strip() or "127.0.0.1"
+            raw_port = input("Puerto API (default 8000): ").strip() or "8000"
+            try:
+                port = int(raw_port)
+            except ValueError:
+                print("Puerto invalido.")
+                wait_for_continue()
+                continue
+            run_fullstack(host=host, port=port, reload_enabled=True)
             continue
 
         if opcion == "0":
@@ -338,7 +402,13 @@ def main() -> None:
     ejecutar_cmd.add_argument("--sin-reload", action="store_true", help="Deshabilitar reload automatico")
 
     subparsers.add_parser("generar-jwt", aliases=["jwt", "secret-key"], help="Generar un nuevo JWT secret key y actualizar .env")
+    
+    subparsers.add_parser("front", aliases=["frontend", "vue"], help="Arrancar solo el frontend de Vue")
 
+    fullstack_cmd = subparsers.add_parser("fullstack", aliases=["full"], help="Arrancar FastAPI y Vue simultaneamente")
+    fullstack_cmd.add_argument("--host", default="127.0.0.1", help="Host de escucha (default: 127.0.0.1)")
+    fullstack_cmd.add_argument("--puerto", type=int, default=8000, help="Puerto de escucha (default: 8000)")
+    fullstack_cmd.add_argument("--sin-reload", action="store_true", help="Deshabilitar reload automatico")
     args = parser.parse_args()
 
     if args.command is None:
@@ -388,6 +458,16 @@ def main() -> None:
 
     if args.command in {"generar-jwt", "jwt", "secret-key"}:
         generate_jwt_secret()
+        return
+
+    if args.command in {"front", "frontend", "vue"}:
+        run_frontend()
+        return
+
+    if args.command in {"fullstack", "full"}:
+        if args.puerto < 1 or args.puerto > 65535:
+            parser.error("El puerto debe estar entre 1 y 65535")
+        run_fullstack(host=args.host, port=args.puerto, reload_enabled=not args.sin_reload)
         return
 
 

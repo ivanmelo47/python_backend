@@ -1,0 +1,197 @@
+// ============================================
+// BASE STYLES - Applied globally
+// ============================================
+
+@use "sass:map";
+@use "../shared/variables" as *;
+@use "../shared/mixins" as *;
+
+// Root font size control (change this to scale entire app)
+html {
+    font-size: 16px; // Base 100% (16px)
+
+    &[data-scale="60"] {
+        font-size: 9.6px; // 60%
+    }
+
+    &[data-scale="70"] {
+        font-size: 11.2px; // 70%
+    }
+
+    &[data-scale="80"] {
+        font-size: 12.8px; // 80%
+    }
+
+    &[data-scale="90"] {
+        font-size: 14.4px; // 90%
+    }
+
+    &[data-scale="100"] {
+        font-size: 16px; // 100%
+    }
+
+    &[data-scale="110"] {
+        font-size: 17.6px; // 110%
+    }
+
+    &[data-scale="120"] {
+        font-size: 19.2px; // 120%
+    }
+}
+
+// Reset
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+// Body
+body {
+    font-family: map.get($font-family, base);
+    font-size: get-font-size(base);
+    line-height: 1.6;
+    color: var(--text-primary);
+    background-color: var(--bg-primary);
+    @include custom-scrollbar(10px);
+    transition:
+        background-color map.get($transitions, base),
+        color map.get($transitions, base);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+// Force global scrollbar support
+::-webkit-scrollbar {
+    width: 10px !important;
+    height: 10px !important;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent !important;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--bg-tertiary) !important;
+    border-radius: 10px !important;
+    border: 2px solid transparent !important;
+    background-clip: padding-box !important;
+
+    &:hover {
+        background: var(--primary) !important;
+    }
+}
+
+// Typography
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: map.get($font-family, heading);
+    font-weight: map.get($font-weights, bold);
+    line-height: 1.2;
+    color: var(--text-primary);
+    margin-bottom: get-spacing(4);
+}
+
+h1 {
+    font-size: get-font-size(4xl);
+}
+
+h2 {
+    font-size: get-font-size(3xl);
+}
+
+h3 {
+    font-size: get-font-size(2xl);
+}
+
+h4 {
+    font-size: get-font-size(xl);
+}
+
+h5 {
+    font-size: get-font-size(lg);
+}
+
+h6 {
+    font-size: get-font-size(base);
+}
+
+p {
+    margin-bottom: get-spacing(4);
+    color: var(--text-secondary);
+}
+
+a {
+    color: var(--primary);
+    text-decoration: none;
+    transition: map.get($transitions, fast);
+
+    &:hover {
+        opacity: 0.8;
+    }
+}
+
+// Lists
+ul,
+ol {
+    padding-left: get-spacing(6);
+    margin-bottom: get-spacing(4);
+}
+
+// Code
+code {
+    font-family: map.get($font-family, mono);
+    background: var(--bg-tertiary);
+    padding: get-spacing(1) get-spacing(2);
+    border-radius: map.get($radius, sm);
+    font-size: get-font-size(sm);
+}
+
+pre {
+    background: var(--bg-tertiary);
+    padding: get-spacing(4);
+    border-radius: map.get($radius, md);
+    overflow-x: auto;
+    @include custom-scrollbar(6px);
+    margin-bottom: get-spacing(4);
+
+    code {
+        background: none;
+        padding: 0;
+    }
+}
+
+// Images
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+// Buttons reset
+button {
+    font-family: inherit;
+    font-size: inherit;
+}
+
+// Selection
+::selection {
+    background: get-color(primary);
+    color: get-color(white);
+}
+
+// Focus visible
+:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+// Disabled elements
+[disabled] {
+    cursor: not-allowed;
+    opacity: 0.6;
+}

@@ -1,0 +1,6 @@
+// Table styles entrypoint (modularized)
+@use "table/core";
+@use "table/grid";
+@use "table/actions";
+@use "table/loading";
+@use "table/theme";

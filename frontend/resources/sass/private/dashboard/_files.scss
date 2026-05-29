@@ -1,0 +1,8 @@
+// Files module styles entrypoint (modularized)
+@use "files/base";
+@use "files/header";
+@use "files/grid";
+@use "files/list";
+@use "files/states";
+@use "files/actions";
+@use "files/public-links-manager";

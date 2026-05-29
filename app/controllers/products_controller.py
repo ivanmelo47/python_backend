@@ -28,7 +28,7 @@ def get_product(product_id: int, db: Session = Depends(get_db)) -> dict:
 @router.post("/", response_model=None, status_code=status.HTTP_201_CREATED)
 def create_product(payload: ProductCreate, db: Session = Depends(get_db)) -> dict:
     data = product_service.create_product(db, payload)
-    return success_response(data=data, msg="Created", code=201).model_dump()
+    return success_response(data=data, message="Created", code=201).model_dump()
 
 
 @router.patch("/{product_id}", response_model=None)
@@ -40,4 +40,4 @@ def update_product(product_id: int, payload: ProductUpdate, db: Session = Depend
 @router.delete("/{product_id}", status_code=status.HTTP_200_OK)
 def delete_product(product_id: int, db: Session = Depends(get_db)) -> dict:
     product_service.delete_product(db, product_id)
-    return success_response(msg="Deleted", code=200).model_dump()
+    return success_response(message="Deleted", code=200).model_dump()

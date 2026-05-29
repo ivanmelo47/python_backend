@@ -1,0 +1,93 @@
+@use "sass:map";
+@use "../../../shared/variables" as *;
+@use "../../../shared/mixins" as *;
+
+.dashboard-content {
+    flex: 1;
+    padding: get-spacing(6);
+    padding-bottom: get-spacing(2); // Reduced space at bottom
+    overflow-y: auto;
+    @include custom-scrollbar(10px);
+
+    @media (max-width: 768px) {
+        padding: get-spacing(3);
+        padding-bottom: get-spacing(1);
+    }
+}
+
+.dashboard-module {
+    padding: 0;
+
+    @media (max-width: 768px) {
+        padding: 0;
+    }
+
+    .sticky-tabs-container {
+        position: sticky;
+        top: 0;
+        z-index: 95;
+        background: var(--bg-tertiary);
+        padding: 0 get-spacing(6);
+
+        margin-left: - get-spacing(6);
+        margin-right: - get-spacing(6);
+        margin-top: - get-spacing(6);
+
+        padding-top: get-spacing(3);
+        padding-bottom: get-spacing(3);
+
+        border-bottom: 1px solid var(--border-color);
+        margin-bottom: get-spacing(2);
+        display: flex;
+
+        @media (max-width: 768px) {
+            margin-left: - get-spacing(3);
+            margin-right: - get-spacing(3);
+            margin-top: - get-spacing(3);
+            padding: get-spacing(2) get-spacing(3);
+            overflow-x: auto;
+            @include hide-scrollbar;
+        }
+
+        .module-tabs {
+            margin-bottom: get-spacing(1);
+            margin-top: 0;
+        }
+    }
+
+    .module-header {
+        margin-bottom: get-spacing(6);
+
+        .module-title {
+            font-size: get-font-size(2xl);
+            font-weight: map.get($font-weights, bold);
+            color: var(--text-primary);
+            margin: 0;
+        }
+    }
+
+    .empty-state {
+        @include card;
+        @include flex-column;
+        align-items: center;
+        text-align: center;
+        padding: get-spacing(12);
+
+        .empty-icon {
+            color: var(--primary);
+            margin-bottom: get-spacing(4);
+            opacity: 0.5;
+        }
+
+        h3 {
+            font-size: get-font-size(lg);
+            font-weight: map.get($font-weights, semibold);
+            margin-bottom: get-spacing(2);
+            color: var(--text-primary);
+        }
+
+        p {
+            color: var(--text-secondary);
+        }
+    }
+}

@@ -1,0 +1,271 @@
+// Modal Component
+@use "../../shared/variables" as *;
+@use "sass:map";
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 3000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    background-color: rgba(0, 0, 0, 0.72); // Even darker for better focus
+    backdrop-filter: blur(10px); // Stronger blur for premium feel
+    transition: all 0.3s ease;
+
+    &.modal-fade-enter-from,
+    &.modal-fade-leave-to {
+        opacity: 0;
+    }
+}
+
+.modal-container {
+    width: 100%;
+    max-width: 40rem; // Modernized default (md)
+    border-radius: 1.5rem; // map.get($radius, 3xl) level
+    box-shadow: 0 32px 64px -12px rgba(0, 0, 0, 0.5);
+    background-color: var(--bg-primary);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    overflow: hidden;
+    transform: scale(1);
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    display: flex;
+    flex-direction: column;
+
+    // Optimized Sizes
+    &.modal-sm {
+        max-width: 28rem;
+    }
+    &.modal-md {
+        max-width: 40rem;
+    }
+    &.modal-lg {
+        max-width: 52rem;
+    }
+    &.modal-xl {
+        max-width: 72rem;
+    }
+    &.modal-full {
+        max-width: 96%;
+        height: 96%;
+    }
+
+    .modal-fade-enter-from &,
+    .modal-fade-leave-to & {
+        transform: scale(0.9) translateY(20px);
+        opacity: 0;
+    }
+}
+
+.modal-header {
+    flex-shrink: 0;
+    position: relative;
+    padding: 1.1rem 1.75rem;
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    [data-theme='dark'] & {
+        background: linear-gradient(to bottom, #1e293b, #0f172a);
+    }
+
+    .header-content {
+        display: flex;
+        align-items: center;
+        gap: 0.85rem;
+    }
+
+    .modal-title {
+        font-size: 1.18rem;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+        margin: 0;
+    }
+
+    .header-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.45rem;
+        background-color: var(--bg-primary);
+        border: 1px solid var(--border-color);
+        border-radius: 0.75rem;
+        color: var(--primary);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .close-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-secondary);
+        width: 32px;
+        height: 32px;
+        border-radius: 9px;
+        transition: all 0.2s ease;
+        cursor: pointer;
+        background-color: rgba(255, 255, 255, 0.05);
+        border: 1px solid transparent;
+
+        &:hover {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border-color: rgba(239, 68, 68, 0.2);
+            transform: scale(1.05);
+        }
+    }
+}
+
+.modal-body {
+    padding: 1.75rem 2.25rem;
+    max-height: 82vh; // More generous height
+    overflow-y: auto;
+    flex-grow: 1;
+
+    &.grid-layout {
+        display: grid;
+        gap: 1.75rem; // Better field separation
+        
+        &.cols-1 { grid-template-columns: 1fr; }
+        &.cols-2 { grid-template-columns: repeat(2, 1fr); }
+        &.cols-3 { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    &::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background-color: var(--border-color);
+        border-radius: 10px;
+    }
+}
+
+.modal-footer {
+    flex-shrink: 0;
+    padding: 1.25rem 2.25rem;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 1.25rem;
+    background-color: var(--bg-tertiary);
+}
+
+// Spanning Utilities for Form Fields
+.col-span-1 {
+    grid-column: span 1;
+}
+.col-span-2 {
+    grid-column: span 2;
+}
+.col-span-3 {
+    grid-column: span 3;
+}
+.col-span-full {
+    grid-column: 1 / -1;
+}
+
+.info-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    padding: 0.875rem 0;
+    border-bottom: 1px solid var(--border-color);
+
+    &:first-child {
+        padding-top: 0;
+    }
+
+    &:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+
+    .info-label {
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--primary);
+        margin-bottom: 0.25rem;
+        opacity: 0.9;
+    }
+
+    .info-value {
+        font-size: 0.95rem;
+        font-weight: 500;
+        color: var(--text-primary);
+        line-height: 1.4;
+        background: transparent;
+        padding: 0;
+        border: none;
+    }
+}
+
+// Select Dropdown Styles
+.modal-body select,
+.form-grid select {
+    width: 100%;
+    padding: 0.75rem 2.5rem 0.75rem 1rem;
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: map.get($radius, lg);
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    appearance: none;
+
+    // Custom arrow
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='M5 7.5L10 12.5L15 7.5' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 1.25rem;
+
+    &:hover {
+        border-color: var(--primary);
+        background-color: var(--bg-tertiary);
+    }
+
+    &:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.1);
+    }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        background-color: var(--bg-tertiary);
+    }
+
+    // Options styling
+    option {
+        background-color: var(--bg-secondary);
+        color: var(--text-primary);
+        padding: 0.5rem;
+
+        &:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        &:disabled {
+            color: var(--text-tertiary);
+            font-style: italic;
+        }
+    }
+}
+
+// Footer removed completely for minimalist design

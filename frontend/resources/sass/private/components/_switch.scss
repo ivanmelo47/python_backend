@@ -1,0 +1,61 @@
+/* Switch Component */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 36px;
+    height: 20px;
+
+    input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ef4444; // Red for inactive
+        border: 1px solid #ef4444;
+        transition: 0.4s;
+        border-radius: 20px;
+
+        &:before {
+            position: absolute;
+            content: ""; // Required for background-image to show
+            height: 16px; // Slightly larger to fit icon better
+            width: 16px;
+            left: 1px;
+            bottom: 1px;
+            background-color: white;
+            transition: 0.4s;
+            border-radius: 50%;
+
+            // X Icon (Red)
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23ef4444"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>');
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: 12px; // Scale icon down within the 16px circle
+        }
+    }
+
+    input:checked + .slider {
+        background-color: #10b981; // Green for active
+        border-color: #10b981;
+    }
+
+    input:focus + .slider {
+        box-shadow: 0 0 1px #10b981;
+    }
+
+    input:checked + .slider:before {
+        transform: translateX(16px);
+        background-color: white;
+
+        // Check Icon (Green)
+        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%2310b981"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>');
+    }
+}

@@ -1,0 +1,398 @@
+// ============================================
+// PRIVATE/AUTHENTICATED AREA STYLES
+// ============================================
+
+@use "../shared/variables" as *;
+@use "../shared/mixins" as *;
+@use "dashboard/dashboard";
+@use "dashboard/table";
+@use "dashboard/files";
+@use "dashboard/users";
+@use "dashboard/settings";
+@use "dashboard/modal";
+@use "modules/maintenance"; // Updated to premium tabbed version
+@use "modules/chatbot";
+@use "modules/icon-manager";
+@use "modules/claves"; // New import
+@use "modules/dynamic-routes";
+@use "modules/profile";
+@use "modules/conversor-img";
+@use "modules/portafolio-editor";
+@use "modules/finanzas/common";
+@use "modules/finanzas/cuentas-ahorro";
+@use "modules/finanzas/tarjetas-credito";
+@use "../shared/premium-cards";
+@use "components/switch";
+
+@use "dashboard/home";
+@use "sass:color";
+@use "sass:map";
+
+.private-layout {
+    display: flex;
+    min-height: 100vh;
+    background: var(--bg-secondary);
+}
+
+// Sidebar
+.private-sidebar {
+    width: 250px;
+    background: var(--bg-primary);
+    border-right: 1px solid var(--border-color);
+    padding: get-spacing(6) get-spacing(4);
+    position: fixed;
+    height: 100vh;
+    overflow-y: auto;
+    @include custom-scrollbar;
+
+    @include respond-to(md) {
+        width: 200px;
+    }
+
+    .logo {
+        font-size: get-font-size(2xl);
+        font-weight: map.get($font-weights, bold);
+        color: var(--primary);
+        margin-bottom: get-spacing(8);
+        text-align: center;
+    }
+
+    nav {
+        ul {
+            list-style: none;
+            padding: 0;
+
+            li {
+                margin-bottom: get-spacing(2);
+
+                a {
+                    display: flex;
+                    align-items: center;
+                    gap: get-spacing(3);
+                    padding: get-spacing(3) get-spacing(4);
+                    border-radius: map.get($radius, md);
+                    color: var(--text-secondary);
+                    font-weight: map.get($font-weights, medium);
+                    @include transition(background, color);
+
+                    .icon {
+                        font-size: get-font-size(lg);
+                    }
+
+                    &:hover {
+                        background: var(--bg-secondary);
+                        color: var(--text-primary);
+                    }
+
+                    &.router-link-active {
+                        background: var(--primary);
+                        color: white;
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Main content area
+.private-main {
+    flex: 1;
+    margin-left: 250px;
+    padding: get-spacing(6);
+
+    @include respond-to(md) {
+        margin-left: 200px;
+    }
+}
+
+// Top bar
+.private-topbar {
+    @include flex-between;
+    padding: get-spacing(4) get-spacing(6);
+    background: var(--bg-primary);
+    border-bottom: 1px solid var(--border-color);
+    border-radius: map.get($radius, lg);
+    margin-bottom: get-spacing(6);
+    box-shadow: map.get($shadows, sm);
+
+    .search-box {
+        flex: 1;
+        max-width: 400px;
+
+        input {
+            @include input-field;
+            padding-left: get-spacing(10);
+        }
+    }
+
+    .user-menu {
+        @include flex-center;
+        gap: get-spacing(4);
+
+        .avatar {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: map.get($radius, full);
+            background: var(--primary);
+            @include flex-center;
+            color: white;
+            font-weight: map.get($font-weights, bold);
+            cursor: pointer;
+            @include transition(transform);
+
+            &:hover {
+                transform: scale(1.1);
+            }
+        }
+    }
+}
+
+// Dashboard cards
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: get-spacing(6);
+    margin-bottom: get-spacing(6);
+}
+
+.stat-card {
+    @include card;
+
+    .stat-header {
+        @include flex-between;
+        margin-bottom: get-spacing(4);
+
+        .icon {
+            width: 3rem;
+            height: 3rem;
+            border-radius: map.get($radius, lg);
+            @include flex-center;
+            font-size: get-font-size(2xl);
+            background: linear-gradient(135deg,
+                    var(--primary) 0%,
+                    var(--primary-dark) 100%);
+            color: white;
+        }
+    }
+
+    .stat-value {
+        font-size: get-font-size(3xl);
+        font-weight: map.get($font-weights, bold);
+        color: var(--text-primary);
+        margin-bottom: get-spacing(1);
+    }
+
+    .stat-label {
+        color: var(--text-secondary);
+        font-size: get-font-size(sm);
+    }
+}
+
+// Data table
+.data-table {
+    @include card;
+    overflow: hidden;
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+
+        thead {
+            background: var(--bg-secondary);
+
+            th {
+                padding: get-spacing(4);
+                text-align: left;
+                font-weight: map.get($font-weights, semibold);
+                color: var(--text-primary);
+                border-bottom: 2px solid var(--border-color);
+            }
+        }
+
+        tbody {
+            tr {
+                border-bottom: 1px solid var(--border-color);
+                @include transition(background);
+
+                &:hover {
+                    background: var(--bg-secondary);
+                }
+
+                td {
+                    padding: get-spacing(4);
+                    color: var(--text-secondary);
+                }
+            }
+        }
+    }
+}
+
+// Buttons
+.btn-secondary {
+    @include button-base;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+
+    &:hover:not(:disabled) {
+        background: var(--bg-tertiary);
+    }
+}
+
+.btn-danger {
+    @include button-base;
+    background: get-color(error);
+    color: white;
+
+    &:hover:not(:disabled) {
+        background: color.scale(get-color(error), $lightness: -10%);
+    }
+}
+
+.btn-success {
+    @include button-base;
+    background: get-color(success);
+    color: white;
+
+    &:hover:not(:disabled) {
+        background: color.scale(get-color(success), $lightness: -10%);
+    }
+}
+
+.btn-solid {
+    @include button-base;
+    background: var(--primary);
+    color: white;
+    border: 1px solid transparent;
+
+    &:hover:not(:disabled) {
+        background: var(--primary-dark);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        transform: translateY(-1px);
+    }
+
+    &:active:not(:disabled) {
+        transform: translateY(0);
+    }
+}
+
+.btn-text-primary {
+    background: transparent;
+    border: none;
+    color: var(--primary);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0;
+
+    &:hover {
+        opacity: 0.8;
+        text-decoration: underline;
+    }
+
+    &:active {
+        transform: scale(0.98);
+    }
+}
+
+.map-action-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0.75rem;
+    background-color: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: map.get($radius, full);
+    color: var(--primary);
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+
+    &:hover {
+        background-color: var(--primary);
+        color: white;
+        border-color: var(--primary);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    &:active {
+        transform: translateY(0);
+    }
+}
+
+.map-action-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.25rem 0.5rem;
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    opacity: 0.8;
+
+    &:hover {
+        color: var(--primary);
+        opacity: 1;
+        text-decoration: underline;
+    }
+}
+
+.btn-ghost {
+    @include button-base;
+    background: transparent;
+    color: var(--text-secondary);
+    border: 0.4px solid transparent;
+    border-color: aliceblue;
+
+    &:hover:not(:disabled) {
+        background: var(--bg-tertiary);
+        color: var(--text-primary);
+    }
+
+    &:active:not(:disabled) {
+        background: var(--bg-secondary);
+    }
+}
+
+// Modal
+// Modal
+// Imported at top
+
+// Alerts/Notifications
+.alert {
+    padding: get-spacing(4);
+    border-radius: map.get($radius, md);
+    margin-bottom: get-spacing(4);
+    border-left: 4px solid;
+
+    &.alert-success {
+        background: rgba(get-color(success), 0.1);
+        border-color: get-color(success);
+        color: get-color(success);
+    }
+
+    &.alert-error {
+        background: rgba(get-color(error), 0.1);
+        border-color: get-color(error);
+        color: get-color(error);
+    }
+
+    &.alert-warning {
+        background: rgba(get-color(warning), 0.1);
+        border-color: get-color(warning);
+        color: get-color(warning);
+    }
+
+    &.alert-info {
+        background: rgba(get-color(info), 0.1);
+        border-color: get-color(info);
+        color: get-color(info);
+    }
+}

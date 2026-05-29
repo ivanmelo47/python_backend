@@ -1,0 +1,258 @@
+@use "sass:map";
+@use "../../../shared/variables" as *;
+@use "../../../shared/mixins" as *;
+
+.header-center {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    position: relative;
+    max-width: 500px;
+    margin: 0 get-spacing(5);
+
+    @media (max-width: 768px) {
+        display: none;
+
+        &.mobile-open {
+            display: flex;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            z-index: 2000;
+            align-items: flex-start;
+            padding: get-spacing(6) get-spacing(4);
+            margin: 0;
+            max-width: 100%;
+            animation: fadeIn 0.2s ease-out;
+
+            .navbar-search-container {
+                width: 100%;
+                max-width: 600px;
+                margin: 0 auto;
+                margin-top: 10vh;
+                animation: slideDown 0.3s ease-out;
+            }
+
+            @keyframes slideDown {
+                from {
+                    opacity: 0;
+                    transform: translateY(-20px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+        }
+    }
+
+    @media (max-width: 1024px) {
+        margin: 0 get-spacing(2);
+        max-width: 300px;
+    }
+}
+
+.mobile-search-toggle {
+    display: none;
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    padding: get-spacing(2);
+    cursor: pointer;
+    border-radius: map.get($radius, md);
+    transition: background 0.2s;
+
+    &:hover {
+        background: var(--bg-secondary);
+        color: var(--primary);
+    }
+
+    @media (max-width: 768px) {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+}
+
+.back-btn-mobile {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    padding: get-spacing(2);
+    margin-right: get-spacing(2);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    border-radius: map.get($radius, md);
+
+    &:hover {
+        background: var(--bg-tertiary);
+    }
+}
+
+.navbar-search-container {
+    width: 100%;
+    position: relative;
+}
+
+.navbar-search-wrapper {
+    display: flex;
+    align-items: center;
+    background: var(--bg-secondary);
+    border: 2px solid var(--primary);
+    border-radius: map.get($radius, lg);
+    padding: 0 get-spacing(3);
+    height: 40px;
+    transition: all 0.2s ease;
+    box-shadow:
+        0 4px 6px -1px rgba(0, 0, 0, 0.1),
+        0 2px 4px -1px rgba(0, 0, 0, 0.06);
+
+    &.focused {
+        background: var(--bg-primary);
+        box-shadow: 0 0 0 2px rgba(var(--primary), 0.2);
+    }
+
+    .search-icon {
+        color: var(--text-tertiary);
+        margin-right: get-spacing(2);
+    }
+
+    input {
+        flex: 1;
+        background: transparent;
+        border: none;
+        color: var(--text-primary);
+        font-size: get-font-size(base);
+        outline: none;
+
+        &::placeholder {
+            color: var(--text-muted);
+        }
+    }
+
+    .clear-btn {
+        background: none;
+        border: none;
+        color: var(--text-tertiary);
+        cursor: pointer;
+        padding: 2px;
+        display: flex;
+        align-items: center;
+        border-radius: map.get($radius, full);
+
+        &:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+        }
+    }
+}
+
+.search-results-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    margin-top: get-spacing(2);
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: map.get($radius, lg);
+    box-shadow: map.get($shadows, xl);
+    overflow: hidden;
+    z-index: 1000;
+
+    ul {
+        list-style: none;
+        padding: get-spacing(1);
+        margin: 0;
+        max-height: 300px;
+        overflow-y: auto;
+        @include custom-scrollbar;
+    }
+
+    li {
+        display: flex;
+        align-items: center;
+        padding: get-spacing(2) get-spacing(3);
+        cursor: pointer;
+        border-radius: map.get($radius, md);
+        transition: background 0.1s ease;
+
+        &:hover,
+        &.selected {
+            background: rgba(var(--primary), 0.1);
+            background: var(--bg-secondary);
+        }
+
+        .result-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            background: var(--bg-secondary);
+            border-radius: map.get($radius, md);
+            margin-right: get-spacing(3);
+            color: var(--primary);
+        }
+
+        .result-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+
+            .result-name {
+                font-weight: map.get($font-weights, semibold);
+                font-size: get-font-size(sm);
+                color: var(--text-primary);
+                display: flex;
+                align-items: center;
+                gap: 6px;
+
+                .breadcrumb-parent {
+                    font-weight: 400;
+                    color: var(--text-tertiary);
+                    font-size: 0.8em;
+                }
+
+                .breadcrumb-sep {
+                    color: var(--text-tertiary);
+                    opacity: 0.5;
+                }
+            }
+
+            .result-path {
+                font-size: get-font-size(xs);
+                color: var(--text-tertiary);
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                max-width: 250px;
+            }
+        }
+
+        .result-arrow {
+            opacity: 0;
+            transition: opacity 0.2s;
+            color: var(--text-muted);
+        }
+
+        &:hover .result-arrow,
+        &.selected .result-arrow {
+            opacity: 1;
+        }
+    }
+
+    .no-results {
+        padding: get-spacing(4);
+        text-align: center;
+        color: var(--text-muted);
+        font-size: get-font-size(sm);
+    }
+}

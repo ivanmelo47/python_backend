@@ -1,0 +1,44 @@
+@use "../../../shared/variables" as *;
+
+.file-explorer {
+    color: var(--text-primary);
+    position: relative;
+    overflow: hidden;
+    height: 100%;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+
+    .explorer-body {
+        flex: 1;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .hidden-file-input {
+        display: none;
+    }
+
+    .custom-icon-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        &.main {
+            width: 48px;
+            height: 48px;
+        }
+
+        &.list {
+            width: 20px;
+            height: 20px;
+        }
+    }
+}

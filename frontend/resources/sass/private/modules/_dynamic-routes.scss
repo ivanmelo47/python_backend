@@ -1,0 +1,156 @@
+// ============================================
+// DYNAMIC ROUTES MODULE STYLES
+// ============================================
+
+.dynamic-routes-manager {
+    padding-bottom: 4rem;
+}
+
+.icon-grid-selector {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 10px;
+    max-height: 200px;
+    overflow-y: auto;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+.icon-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 8px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+
+.icon-option:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.icon-option.selected {
+    background: var(--primary-color, #42b983);
+    color: white;
+}
+
+.icon-svg-min {
+    width: 24px;
+    height: 24px;
+}
+
+.icon-svg-min svg {
+    width: 100%;
+    height: 100%;
+    fill: currentColor;
+}
+
+.icon-name-min {
+    font-size: 10px;
+    margin-top: 4px;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 100%;
+}
+
+.child-manager {
+    border-top: 1px solid var(--border-color);
+    margin-top: 10px;
+    padding-top: 14px;
+}
+
+.child-manager-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.child-manager-header h3 {
+    margin: 0;
+    font-size: 14px;
+}
+
+.child-empty {
+    opacity: 0.75;
+    font-size: 13px;
+}
+
+.child-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 220px;
+    overflow-y: auto;
+}
+
+.child-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.child-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.child-info span {
+    opacity: 0.8;
+    font-size: 12px;
+}
+
+.child-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.child-action {
+    border: 1px solid var(--border-color);
+    background: transparent;
+    color: inherit;
+    border-radius: 6px;
+    padding: 4px 8px;
+    cursor: pointer;
+}
+
+.child-action.delete {
+    border-color: rgba(255, 99, 99, 0.5);
+    color: #ff8f8f;
+}
+
+.modal-header-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+}
+
+.breadcrumb-link {
+    border: none;
+    background: transparent;
+    color: inherit;
+    opacity: 0.8;
+    cursor: pointer;
+    padding: 0;
+    font-weight: 600;
+}
+
+.breadcrumb-link:hover {
+    opacity: 1;
+    text-decoration: underline;
+}
+
+.breadcrumb-separator {
+    opacity: 0.6;
+}

@@ -1,0 +1,44 @@
+@use "sass:map";
+@use "../../../shared/variables" as *;
+@use "../../../shared/mixins" as *;
+
+.layout-dashboard {
+    display: flex;
+    min-height: 100vh;
+    background: var(--bg-tertiary);
+    position: relative;
+    overflow: hidden;
+}
+
+.main-wrapper {
+    flex: 1;
+    margin-left: 260px;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    height: 100vh;
+    overflow: hidden;
+    @include transition(margin-left);
+
+    &.expanded {
+        margin-left: 80px;
+    }
+
+    @media (max-width: 768px) {
+        margin-left: 0 !important;
+        width: 100%;
+    }
+}
+
+.sidebar-mobile-backdrop {
+    display: none;
+
+    @media (max-width: 768px) {
+        display: block;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 899;
+        animation: fadeIn 0.3s ease-out;
+    }
+}

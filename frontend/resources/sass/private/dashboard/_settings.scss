@@ -1,0 +1,54 @@
+@use "sass:map";
+@use '../../shared/variables' as *;
+@use '../../shared/mixins' as *;
+
+.settings-section {
+    @include card;
+    padding: get-spacing(6);
+
+    h3 {
+        font-size: get-font-size(lg);
+        font-weight: map.get($font-weights, semibold);
+        margin-bottom: get-spacing(4);
+        color: var(--text-primary);
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: get-spacing(2);
+    }
+
+    .setting-item {
+        margin-bottom: get-spacing(4);
+
+        label {
+            display: block;
+            font-weight: map.get($font-weights, medium);
+            color: var(--text-secondary);
+            margin-bottom: get-spacing(2);
+        }
+
+        .scale-options {
+            display: flex;
+            flex-wrap: wrap; // Allow buttons to wrap
+            gap: get-spacing(2);
+
+            .scale-btn {
+                padding: get-spacing(2) get-spacing(4);
+                border: 1px solid var(--border-color);
+                background: var(--bg-primary);
+                color: var(--text-primary);
+                border-radius: map.get($radius, md);
+                cursor: pointer;
+                transition: all 0.2s;
+
+                &:hover {
+                    background: var(--bg-secondary);
+                }
+
+                &.active {
+                    background: var(--primary);
+                    color: white;
+                    border-color: var(--primary);
+                }
+            }
+        }
+    }
+}

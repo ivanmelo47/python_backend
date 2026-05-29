@@ -1,0 +1,228 @@
+@use "../../../shared/variables" as *;
+@use "../../../shared/mixins" as *;
+
+.file-explorer {
+    .explorer-list {
+        padding: 0;
+        flex: 1;
+        overflow-y: auto;
+        min-height: 0;
+        @include custom-scrollbar;
+
+        .list-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 0.9rem;
+
+            th {
+                text-align: left;
+                padding: 1rem 1.5rem;
+                background: var(--bg-secondary);
+                color: var(--primary);
+                font-weight: 700;
+                font-size: 0.75rem;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                border-bottom: 1px solid var(--border-color);
+
+                &:first-child {
+                    border-top-left-radius: 12px;
+                }
+                &:last-child {
+                    border-top-right-radius: 12px;
+                }
+            }
+
+            .list-row {
+                transition: all 0.2s ease;
+                cursor: pointer;
+                border-bottom: 1px solid var(--border-color);
+
+                &:hover {
+                    background: var(--bg-tertiary) !important;
+
+                    .folder-name-text {
+                        color: var(--primary);
+                    }
+
+                    .folder-icon {
+                        transform: scale(1.1);
+                    }
+                }
+
+                &.active {
+                    background: rgba(var(--primary-rgb), 0.05);
+                }
+            }
+
+            td {
+                padding: 1rem 1.5rem;
+                border-bottom: 1px solid var(--border-color);
+                color: var(--text-secondary);
+                vertical-align: middle;
+            }
+
+            .list-row:last-child {
+                td {
+                    border-bottom: none;
+                }
+                td:first-child {
+                    border-bottom-left-radius: 12px;
+                }
+                td:last-child {
+                    border-bottom-right-radius: 12px;
+                }
+            }
+
+            .row-clickable {
+                cursor: pointer;
+                transition: background 0.2s ease;
+
+                &:hover {
+                    background: rgba(var(--primary-rgb), 0.02);
+
+                    .name-wrapper span {
+                        color: var(--primary);
+                    }
+                }
+            }
+
+            .name-wrapper {
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                font-weight: 600;
+                color: var(--text-primary);
+
+                .list-icon-wrapper {
+                    position: relative;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    color: var(--primary);
+                    width: 24px;
+                    height: 24px;
+                    line-height: 1;
+                    flex-shrink: 0;
+
+                    > .icon {
+                        width: 20px;
+                        height: 20px;
+                        flex-shrink: 0;
+                    }
+
+                    .custom-icon-wrapper.list {
+                        width: 20px;
+                        height: 20px;
+                        flex-shrink: 0;
+                    }
+
+                    .status-lock {
+                        position: absolute;
+                        bottom: -4px;
+                        right: -4px;
+                        background: var(--bg-primary);
+                        border: 1px solid var(--border-color);
+                        border-radius: 50%;
+                        width: 18px;
+                        height: 18px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        color: var(--text-tertiary);
+                        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+                        &.is-public {
+                            display: none;
+                        }
+
+                        &.is-shared {
+                            color: #3b82f6;
+                        }
+
+                        &.is-link {
+                            color: var(--primary);
+                        }
+                    }
+                }
+
+                .folder-name-text {
+                    color: var(--text-primary);
+                    transition: color 0.2s ease;
+                }
+            }
+
+            .text-muted {
+                color: var(--text-tertiary);
+                font-size: 0.85rem;
+            }
+
+            .col-actions {
+                text-align: left;
+                width: 60px;
+                padding-left: 1.5rem !important;
+
+                .action-dropdown {
+                    display: inline-block;
+                    position: relative;
+
+                    .dropdown-menu.list-mode {
+                        position: absolute;
+                        top: -8px;
+                        left: 100%;
+                        margin-left: 12px;
+                        background: var(--bg-secondary);
+                        border: 1px solid var(--border-color);
+                        border-radius: 12px;
+                        padding: 0.5rem;
+                        min-width: 140px;
+                        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+                        z-index: 100;
+                        text-align: left;
+
+                        &::before {
+                            content: "";
+                            position: absolute;
+                            top: 14px;
+                            left: -6px;
+                            width: 10px;
+                            height: 10px;
+                            background: var(--bg-secondary);
+                            border-bottom: 1px solid var(--border-color);
+                            border-left: 1px solid var(--border-color);
+                            transform: rotate(45deg);
+                        }
+
+                        .dropdown-item {
+                            display: flex;
+                            align-items: center;
+                            gap: 0.75rem;
+                            padding: 0.6rem 0.75rem;
+                            width: 100%;
+                            border: none;
+                            background: transparent;
+                            color: var(--text-secondary);
+                            font-size: 0.85rem;
+                            border-radius: 8px;
+                            cursor: pointer;
+                            transition: all 0.2s ease;
+
+                            &:hover {
+                                background: var(--bg-tertiary);
+                                color: var(--primary);
+                            }
+
+                            &.delete {
+                                &:hover {
+                                    background: rgba(var(--error-rgb), 0.1);
+                                    color: var(--error);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

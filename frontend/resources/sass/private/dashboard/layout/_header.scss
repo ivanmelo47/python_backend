@@ -1,0 +1,300 @@
+@use "sass:map";
+@use "../../../shared/variables" as *;
+@use "../../../shared/mixins" as *;
+
+.dashboard-header {
+    height: 60px;
+    background: var(--bg-primary);
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 get-spacing(6);
+    flex-shrink: 0;
+    z-index: 900;
+
+    .header-left {
+        display: flex;
+        align-items: center;
+        gap: get-spacing(4);
+    }
+
+    .toggle-sidebar-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: get-spacing(2);
+        color: var(--text-secondary);
+        border-radius: map.get($radius, md);
+        @include transition(background);
+
+        &:hover {
+            background: var(--bg-secondary);
+            color: var(--primary);
+        }
+    }
+
+    .page-title {
+        font-size: get-font-size(lg);
+        font-weight: map.get($font-weights, semibold);
+        color: var(--text-primary);
+        margin: 0;
+    }
+
+    .header-right {
+        display: flex;
+        align-items: center;
+        gap: get-spacing(3);
+        position: relative;
+
+        .user-profile-header {
+            display: flex;
+            align-items: center;
+            gap: get-spacing(3);
+            margin: 0 get-spacing(2);
+            padding: get-spacing(1) get-spacing(3);
+            border-radius: map.get($radius, md);
+            cursor: pointer;
+            @include transition(background);
+            border: 1px solid transparent;
+
+            &:hover,
+            &.active {
+                background: var(--bg-secondary);
+                border-color: var(--border-color);
+            }
+
+            .user-info {
+                text-align: right;
+                display: none;
+
+                @include respond-to(sm) {
+                    display: flex;
+                    flex-direction: column;
+                }
+
+                .name {
+                    font-size: get-font-size(sm);
+                    font-weight: map.get($font-weights, semibold);
+                    color: var(--text-primary);
+                }
+
+                .role {
+                    font-size: get-font-size(xs);
+                    color: var(--text-tertiary);
+                }
+            }
+
+            .avatar {
+                width: 38px;
+                height: 38px;
+                border-radius: map.get($radius, full);
+                background: var(--primary);
+                color: white;
+                @include flex-center;
+                overflow: hidden;
+
+                &.has-image {
+                    background: var(--bg-secondary);
+                }
+
+                img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                    display: block;
+                }
+            }
+
+            .chevron {
+                color: var(--text-tertiary);
+                transition: transform 0.3s ease;
+
+                &.rotate {
+                    transform: rotate(180deg);
+                }
+            }
+        }
+
+        .user-dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: get-spacing(2);
+            width: 220px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: map.get($radius, lg);
+            box-shadow: map.get($shadows, lg);
+            z-index: 1000;
+            overflow: visible;
+            display: flex;
+            flex-direction: column;
+            animation: slideDownFade 0.2s ease-out;
+
+            .menu-header {
+                padding: get-spacing(3) get-spacing(4);
+                border-bottom: 1px solid var(--border-color);
+
+                .label {
+                    font-size: get-font-size(xs);
+                    font-weight: map.get($font-weights, bold);
+                    color: var(--text-tertiary);
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                }
+            }
+
+            .menu-item {
+                display: flex;
+                align-items: center;
+                gap: get-spacing(3);
+                padding: get-spacing(3) get-spacing(4);
+                background: none;
+                border: none;
+                width: 100%;
+                text-align: left;
+                cursor: pointer;
+                color: var(--text-secondary);
+                font-size: get-font-size(sm);
+                @include transition(background, color);
+
+                &:hover {
+                    background: var(--bg-secondary);
+                    color: var(--primary);
+                }
+
+                &.danger {
+                    color: get-color(error);
+
+                    &:hover {
+                        background: rgba(get-color(error), 0.1);
+                    }
+                }
+            }
+
+            .menu-item-wrapper {
+                position: relative;
+            }
+
+            .chevron {
+                color: var(--text-tertiary);
+                transition: transform 0.3s ease;
+
+                &.rotate {
+                    transform: rotate(180deg);
+                }
+
+                &.rotate-minus-90 {
+                    transform: rotate(90deg);
+                }
+            }
+
+            .submenu-options.floating-menu {
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                margin-top: 4px;
+                margin-right: 0;
+                width: 100%;
+                background: var(--bg-primary);
+                border: 1px solid var(--border-color);
+                border-radius: map.get($radius, md);
+                box-shadow: map.get($shadows, xl);
+                padding: get-spacing(1);
+                z-index: 1002;
+                overflow: hidden;
+
+                .submenu-header {
+                    display: none;
+                }
+
+                .submenu-item {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    padding: get-spacing(2) get-spacing(3);
+                    border: none;
+                    background: none;
+                    width: 100%;
+                    text-align: left;
+                    cursor: pointer;
+                    color: var(--text-secondary);
+                    font-size: get-font-size(sm);
+                    border-radius: map.get($radius, sm);
+                    margin-bottom: 0;
+                    @include transition(all);
+
+                    &:hover {
+                        color: var(--primary);
+                        background: var(--bg-secondary);
+                        transform: none;
+                    }
+
+                    &.active {
+                        color: white;
+                        background: var(--primary);
+                        font-weight: map.get($font-weights, medium);
+                        box-shadow: none;
+
+                        &:hover {
+                            opacity: 1;
+                        }
+
+                        .check-icon {
+                            color: white;
+                        }
+                    }
+
+                    .check-icon {
+                        color: var(--primary);
+                    }
+                }
+            }
+
+            .menu-divider {
+                height: 1px;
+                background: var(--border-color);
+                margin: get-spacing(1) 0;
+            }
+        }
+
+        .menu-backdrop {
+            position: fixed;
+            inset: 0;
+            z-index: 999;
+            cursor: default;
+        }
+    }
+
+    .color-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+}
+
+.fade-slide-enter-active,
+.fade-slide-leave-active {
+    transition: all 0.2s ease;
+}
+
+.fade-slide-enter-from,
+.fade-slide-leave-to {
+    opacity: 0;
+    transform: translateY(-10px);
+}
+
+@keyframes slideDownFade {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

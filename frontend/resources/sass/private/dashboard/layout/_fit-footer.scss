@@ -1,0 +1,37 @@
+@use "sass:map";
+@use "../../../shared/variables" as *;
+@use "../../../shared/mixins" as *;
+
+.main-wrapper.fit-screen {
+    .dashboard-content {
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        height: 100%;
+        min-height: 0;
+
+        .dashboard-module,
+        .gestion-usuarios-container,
+        .users-list,
+        .file-explorer,
+        .icon-manager-container,
+        .dynamic-routes-manager {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            max-height: 100%;
+        }
+
+        .module-tabs {
+            flex-shrink: 0;
+        }
+    }
+}
+
+.dashboard-footer {
+    flex-shrink: 0;
+    padding: 0 get-spacing(6) get-spacing(3) get-spacing(6);
+    background: var(--bg-primary);
+    z-index: 10;
+}

@@ -1,0 +1,243 @@
+@use "sass:map";
+@use "../../../shared/variables" as *;
+@use "../../../shared/mixins" as *;
+
+.btn-solid-dark {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: get-spacing(2) get-spacing(4);
+    border-radius: map.get($radius, md);
+    font-size: get-font-size(xs);
+    font-weight: map.get($font-weights, bold);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: get-spacing(2);
+    cursor: pointer;
+    @include transition(transform, opacity);
+
+    &:hover {
+        opacity: 0.9;
+        transform: translateY(-1px);
+    }
+}
+
+.actions-wrapper {
+    position: relative;
+    display: flex;
+    justify-content: flex-start;
+
+    .action-btn.dots {
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        padding: get-spacing(1);
+        border-radius: map.get($radius, md);
+        color: var(--text-secondary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        @include transition(background, color);
+
+        &:hover {
+            background: var(--bg-secondary);
+            color: var(--primary);
+        }
+    }
+
+    .actions-dropdown-menu {
+        /* Legacy / fallback — teleported version uses inline fixed style from JS */
+        position: absolute;
+        top: -8px;
+        left: 100%;
+        z-index: 50;
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        border-radius: map.get($radius, md);
+        box-shadow: map.get($shadows, lg);
+        min-width: 160px;
+        padding: get-spacing(1);
+        margin-left: get-spacing(3);
+    }
+}
+
+/* Teleported dropdown — rendered in <body>, positioned via JS with position:fixed */
+.actions-dropdown-menu.teleported {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: map.get($radius, md);
+    box-shadow: map.get($shadows, lg);
+    padding: get-spacing(1);
+    pointer-events: auto;
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: get-spacing(3);
+    width: 100%;
+    padding: get-spacing(2) get-spacing(3);
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: get-font-size(sm);
+    font-weight: map.get($font-weights, medium);
+    text-align: left;
+    cursor: pointer;
+    border-radius: map.get($radius, sm);
+    @include transition(background, color);
+
+    &:hover {
+        background: var(--bg-tertiary);
+        color: var(--primary);
+    }
+
+    &.danger,
+    &.delete {
+        &:hover {
+            color: get-color(error);
+            background: rgba(map.get($colors, error), 0.1);
+        }
+    }
+}
+
+/* Header Actions Dropdown (Reusable) */
+.header-actions-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    
+    .header-dropdown-trigger {
+        height: 44px; // Perfectly match the height of .view-toggle container (34px + 8px padding + 2px border)
+        display: flex;
+        align-items: center;
+        gap: get-spacing(3);
+        padding: 0 get-spacing(5);
+        background: var(--bg-tertiary);
+        border: 1px solid var(--border-color);
+        border-radius: map.get($radius, md);
+        color: var(--text-secondary);
+        font-size: 0.75rem;
+        font-weight: map.get($font-weights, bold);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        
+        .icon {
+            color: var(--text-tertiary);
+            transition: transform 0.3s ease;
+        }
+        
+        &:hover {
+            border-color: var(--primary);
+            color: var(--text-primary);
+            background: var(--bg-primary);
+            box-shadow: map.get($shadows, sm);
+            
+            .icon {
+                color: var(--primary);
+                transform: scale(1.1);
+            }
+        }
+        
+        &.active {
+            background: var(--bg-primary);
+            color: var(--primary);
+            border-color: var(--primary);
+            box-shadow: map.get($shadows, sm), 0 0 0 2px rgba(var(--primary-rgb), 0.1);
+            
+            .icon {
+                color: var(--primary);
+                transform: rotate(45deg) scale(1.1);
+            }
+        }
+    }
+    
+    .header-actions-menu {
+        position: absolute;
+        top: calc(100% + 8px);
+        right: 0;
+        z-index: 1001;
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        border-radius: map.get($radius, lg);
+        box-shadow: map.get($shadows, xl);
+        min-width: 220px;
+        padding: get-spacing(2);
+        animation: table-header-dropdown-slide 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        backdrop-filter: blur(10px);
+        
+        .dropdown-item {
+            border-radius: map.get($radius, md);
+            margin-bottom: 2px;
+            padding: get-spacing(3) get-spacing(4);
+            
+            &:last-child { margin-bottom: 0; }
+            
+            span {
+                font-weight: 600;
+            }
+            
+            &:hover {
+                transform: scale(1.05);
+                background: var(--bg-tertiary);
+                box-shadow: map.get($shadows, md);
+                z-index: 2;
+                color: var(--text-primary);
+            }
+
+            // Semantic Colors
+            &.item-income:hover {
+                color: var(--success) !important;
+                background: rgba(16, 185, 129, 0.15) !important;
+                border-left: 3px solid var(--success);
+                padding-left: calc(get-spacing(4) - 3px);
+                .icon { color: var(--success); }
+            }
+            &.item-expense:hover {
+                color: var(--danger) !important;
+                background: rgba(239, 68, 68, 0.15) !important;
+                border-left: 3px solid var(--danger);
+                padding-left: calc(get-spacing(4) - 3px);
+                .icon { color: var(--danger); }
+            }
+            &.item-primary:hover {
+                color: var(--info) !important;
+                background: rgba(59, 130, 246, 0.15) !important;
+                border-left: 3px solid var(--info);
+                padding-left: calc(get-spacing(4) - 3px);
+                .icon { color: var(--info); }
+            }
+        }
+        
+        .menu-divider {
+            height: 1px;
+            background: var(--border-color);
+            margin: get-spacing(2) 0;
+            opacity: 0.6;
+        }
+    }
+}
+
+.menu-overlay-transparent {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1000;
+}
+
+@keyframes table-header-dropdown-slide {
+    from { 
+        opacity: 0; 
+        transform: translateY(-10px) scale(0.95); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0) scale(1); 
+    }
+}

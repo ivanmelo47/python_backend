@@ -1,0 +1,309 @@
+// ============================================
+// SHARED VARIABLES - Used in both Landing & Private
+// ============================================
+
+// Color Palette
+$colors: (
+    // Primary
+    primary: #42b983,
+    primary-dark: #359268,
+    primary-light: #5ecfa0,
+
+    // Secondary
+    secondary: #35495e,
+    secondary-dark: #2c3e50,
+    secondary-light: #4a6075,
+
+    // Accent
+    accent: #667eea,
+    accent-dark: #5568d3,
+    accent-light: #8592f0,
+
+    // Status Colors
+    success: #10b981,
+    warning: #f59e0b,
+    error: #ef4444,
+    info: #3b82f6,
+
+    // Neutrals
+    white: #ffffff,
+    black: #000000,
+    gray-50: #f9fafb,
+    gray-100: #f3f4f6,
+    gray-200: #e5e7eb,
+    gray-300: #d1d5db,
+    gray-400: #9ca3af,
+    gray-500: #6b7280,
+    gray-600: #4b5563,
+    gray-700: #374151,
+    gray-800: #1f2937,
+    gray-900: #111827
+);
+
+@use "sass:map";
+
+// Dark Mode Colors (CSS Custom Properties)
+// Dark Mode Colors (CSS Custom Properties)
+:root {
+    // Light mode (default)
+    --bg-primary: #{map.get($colors, white)};
+    --bg-primary-rgb: 255, 255, 255;
+    --bg-secondary: #{map.get($colors, gray-50)};
+    --bg-secondary-rgb: 249, 250, 251;
+    --bg-tertiary: #{map.get($colors, gray-100)};
+    --bg-tertiary-rgb: 243, 244, 246;
+
+    --text-primary: #{map.get($colors, gray-900)};
+    --text-secondary: #{map.get($colors, gray-700)};
+    --text-tertiary: #{map.get($colors, gray-500)};
+    --text-muted: #{map.get($colors, gray-400)}; // Added for placeholders
+
+    --border-color: #{map.get($colors, gray-200)};
+    --shadow-color: rgba(0, 0, 0, 0.1);
+
+    // Status Colors (Exposed to JS)
+    --success: #{map.get($colors, success)};
+    --warning: #{map.get($colors, warning)};
+    --danger: #{map.get($colors, error)};
+    --info: #{map.get($colors, info)};
+
+    // Default Primary (Green - #42b983)
+    --primary: #{map.get($colors, primary)};
+    --primary-dark: #{map.get($colors, primary-dark)};
+    --accent: #{map.get($colors, accent)};
+}
+
+// Color Themes
+[data-color-theme="blue"] {
+    --primary: #3b82f6; // Blue 500
+    --primary-dark: #2563eb; // Blue 600
+}
+
+[data-color-theme="purple"] {
+    --primary: #8b5cf6; // Purple 500
+    --primary-dark: #7c3aed; // Purple 600
+}
+
+[data-color-theme="orange"] {
+    --primary: #f97316; // Orange 500
+    --primary-dark: #ea580c; // Orange 600
+}
+
+[data-color-theme="red"] {
+    --primary: #ef4444; // Red 500
+    --primary-dark: #dc2626; // Red 600
+}
+
+[data-color-theme="gold"] {
+    --primary: #f59e0b; // Amber 500
+    --primary-dark: #d97706; // Amber 600
+}
+
+[data-theme="dark"] {
+    --bg-primary: #{map.get($colors, gray-900)};
+    --bg-primary-rgb: 17, 24, 39;
+    --bg-secondary: #{map.get($colors, gray-800)};
+    --bg-secondary-rgb: 31, 41, 55;
+    --bg-tertiary: #{map.get($colors, gray-700)};
+    --bg-tertiary-rgb: 55, 65, 81;
+
+    --text-primary: #{map.get($colors, gray-50)};
+    --text-secondary: #{map.get($colors, gray-300)};
+    --text-tertiary: #{map.get($colors, gray-400)};
+    --text-muted: #{map.get($colors, gray-600)}; // Darker for dark mode placeholders
+
+    --border-color: #{map.get($colors, gray-600)};
+    --shadow-color: rgba(0, 0, 0, 0.3);
+
+    --primary: #{map.get($colors, primary-light)}; // Light Green Default
+    --primary-dark: #{map.get($colors, primary)}; // Use base primary as dark in dark mode
+    --accent: #{map.get($colors, accent-light)};
+
+    // Dark Mode Theme Overrides
+    &[data-color-theme="blue"] {
+        --primary: #60a5fa; // Blue 400
+        --primary-dark: #3b82f6; // Blue 500
+    }
+
+    &[data-color-theme="purple"] {
+        --primary: #a78bfa; // Purple 400
+        --primary-dark: #8b5cf6; // Purple 500
+    }
+
+    &[data-color-theme="orange"] {
+        --primary: #fb923c; // Orange 400
+        --primary-dark: #f97316; // Orange 500
+    }
+
+    &[data-color-theme="red"] {
+        --primary: #f87171; // Red 400
+        --primary-dark: #ef4444; // Red 500
+    }
+
+    &[data-color-theme="gold"] {
+        --primary: #fbbf24; // Amber 400
+        --primary-dark: #f59e0b; // Amber 500
+    }
+}
+
+// Typography
+$font-family: (
+    base: (
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        Oxygen,
+        Ubuntu,
+        Cantarell,
+        sans-serif,
+    ),
+    mono: (
+        "Courier New",
+        Courier,
+        monospace,
+    ),
+    heading: (
+        "Inter",
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif,
+    ),
+);
+
+// Font Sizes (rem-based for scalability)
+$font-sizes: (
+    xs: 0.75rem,
+    // 12px at default
+    sm: 0.875rem,
+    // 14px
+    base: 1rem,
+    // 16px
+    lg: 1.125rem,
+    // 18px
+    xl: 1.25rem,
+    // 20px
+    2xl: 1.5rem,
+    // 24px
+    3xl: 1.875rem,
+    // 30px
+    4xl: 2.25rem,
+    // 36px
+    5xl: 3rem,
+    // 48px
+    6xl: 3.75rem, // 60px
+);
+
+// Font Weights
+$font-weights: (
+    light: 300,
+    normal: 400,
+    medium: 500,
+    semibold: 600,
+    bold: 700,
+    extrabold: 800,
+);
+
+// Spacing (rem-based)
+$spacing: (
+    0: 0,
+    1: 0.25rem,
+    // 4px
+    2: 0.5rem,
+    // 8px
+    3: 0.75rem,
+    // 12px
+    4: 1rem,
+    // 16px
+    5: 1.25rem,
+    // 20px
+    6: 1.5rem,
+    // 24px
+    8: 2rem,
+    // 32px
+    10: 2.5rem,
+    // 40px
+    12: 3rem,
+    // 48px
+    16: 4rem,
+    // 64px
+    20: 5rem,
+    // 80px
+    24: 6rem, // 96px
+);
+
+// Border Radius
+$radius: (
+    none: 0,
+    sm: 0.25rem,
+    // 4px
+    md: 0.5rem,
+    // 8px
+    lg: 0.75rem,
+    // 12px
+    xl: 1rem,
+    // 16px
+    2xl: 1.5rem,
+    // 24px
+    full: 9999px,
+);
+
+// Shadows
+$shadows: (
+    sm: (
+        0 0.125rem 0.25rem rgba(0, 0, 0, 0.075),
+    ),
+    md: (
+        0 0.25rem 0.5rem rgba(0, 0, 0, 0.1),
+    ),
+    lg: (
+        0 0.5rem 1rem rgba(0, 0, 0, 0.15),
+    ),
+    xl: (
+        0 1.25rem 1.5rem rgba(0, 0, 0, 0.2),
+    ),
+    2xl: (
+        0 1.5rem 3rem rgba(0, 0, 0, 0.25),
+    ),
+);
+
+// Transitions
+$transitions: (
+    fast: 0.15s ease,
+    base: 0.3s ease,
+    slow: 0.5s ease,
+);
+
+// Breakpoints
+$breakpoints: (
+    sm: 640px,
+    md: 768px,
+    lg: 1024px,
+    xl: 1280px,
+    2xl: 1536px,
+);
+
+// Z-index layers
+$z-index: (
+    dropdown: 1000,
+    sticky: 1020,
+    fixed: 1030,
+    modal-backdrop: 1040,
+    modal: 1050,
+    popover: 1060,
+    tooltip: 1070,
+);
+
+// Helper function to get values from maps
+@function get-color($color-name) {
+    @return map.get($colors, $color-name);
+}
+
+@function get-spacing($size) {
+    @return map.get($spacing, $size);
+}
+
+@function get-font-size($size) {
+    @return map.get($font-sizes, $size);
+}

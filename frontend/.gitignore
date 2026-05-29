@@ -1,0 +1,7 @@
+# Root Dependencies
+/node_modules
+.env
+/assets
+/dist
+/index.dev.html
+/index.html
