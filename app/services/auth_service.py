@@ -256,11 +256,21 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
 
 
 def require_master(current_user: User = Depends(get_current_user)) -> User:
-    """Dependency que exige que el usuario autenticado sea Master (role level 1)."""
-    if not current_user.role or current_user.role.level != 1:
+    """Dependency que exige que el usuario autenticado sea Master (role hierarchy 1)."""
+    if not current_user.role or current_user.role.hierarchy != 1:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Only Master users can perform this action"
+        )
+    return current_user
+
+
+def require_admin(current_user: User = Depends(get_current_user)) -> User:
+    """Dependency que exige que el usuario autenticado sea Admin o Master (role hierarchy <= 2)."""
+    if not current_user.role or current_user.role.hierarchy > 2:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only Admin or Master users can perform this action"
         )
     return current_user
 

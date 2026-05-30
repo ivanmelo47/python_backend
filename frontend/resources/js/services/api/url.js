@@ -9,6 +9,17 @@ const normalizeApiBase = (value) => {
 
 export const API_BASE_URL = normalizeApiBase(import.meta.env.VITE_API_BASE_URL);
 
+const getApiPathname = (value = "") => {
+    const candidate = String(value || "").trim();
+    if (!candidate) return "";
+
+    try {
+        return new URL(candidate, "http://localhost").pathname.replace(/\/+$/, "");
+    } catch {
+        return candidate.startsWith("/") ? trimTrailingSlash(candidate) : `/${trimTrailingSlash(candidate)}`;
+    }
+};
+
 export const BACKEND_BASE_URL = (() => {
     const apiBase = API_BASE_URL;
     if (apiBase === "/api") {
@@ -50,12 +61,17 @@ export const toAbsoluteBackendUrl = (value) => {
     if (isAbsoluteUrl(raw)) return raw;
 
     const normalizedPath = raw.startsWith("/") ? raw : `/${raw}`;
+    const apiPathname = getApiPathname(API_BASE_URL);
+    const pathWithoutApiBase =
+        apiPathname && normalizedPath.startsWith(`${apiPathname}/`)
+            ? normalizedPath.slice(apiPathname.length)
+            : normalizedPath;
 
     if (!BACKEND_BASE_URL) {
         return normalizedPath;
     }
 
-    return `${BACKEND_BASE_URL}${normalizedPath}`;
+    return `${BACKEND_BASE_URL}${pathWithoutApiBase}`;
 };
 
 const extractShareToken = (value = "") => {

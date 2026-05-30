@@ -1,5 +1,5 @@
 import uuid
-from sqlalchemy import Column, Integer, String, Text, ForeignKey, DateTime
+from sqlalchemy import Column, Integer, String, Text, ForeignKey, DateTime, Boolean
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.db.base import Base
@@ -12,10 +12,12 @@ class Icon(Base):
     name = Column(String(100), unique=True, index=True, nullable=False)
     type = Column(String(50), default="svg") # svg, img
     file_path = Column(String(255), nullable=True)
+    storage_mode = Column(String(50), default="database") # database, file
     svg_content = Column(Text, nullable=True)
     viewBox = Column(String(50), nullable=True)
     color_mode = Column(String(50), default="currentColor") # currentColor, original
     category = Column(String(50), index=True, nullable=True)
+    is_active = Column(Boolean, default=True)
     created_by = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     
     created_at = Column(DateTime(timezone=True), server_default=func.now())

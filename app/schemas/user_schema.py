@@ -1,8 +1,10 @@
 from datetime import datetime
+from typing import Optional
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 from app.schemas.role_schema import RoleRead
+from app.schemas.app_config_global_schema import AppConfigGlobalResponse
 
 
 class UserBase(BaseModel):
@@ -35,7 +37,8 @@ class UserRead(UserBase):
     uuid: str
     confirmed: bool
     created_at: datetime
-    role: RoleRead | None = None
+    role: Optional[RoleRead] = None
+    config: Optional[AppConfigGlobalResponse] = None
 
     model_config = ConfigDict(from_attributes=True)
 

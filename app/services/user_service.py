@@ -30,10 +30,10 @@ def update_user(db: Session, user_id: int, payload: UserUpdate, current_user: Us
     user = get_user_or_404(db, user_id)
 
     if current_user.id != user.id:
-        if current_user.role.level >= user.role.level:
+        if current_user.role.hierarchy >= user.role.hierarchy:
             raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Not enough permissions to edit a user with the same or higher role level",
+                status_code=403,
+                detail="Not enough permissions to edit a user with the same or higher role hierarchy",
             )
 
     if payload.email and payload.email != user.email:

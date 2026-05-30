@@ -66,6 +66,16 @@ def get_sessions_by_user(db: Session, user_id: int) -> list[UserSession]:
     )
 
 
+def get_all_login_activities(db: Session, skip: int = 0, limit: int = 100) -> list[UserSession]:
+    return (
+        db.query(UserSession)
+        .order_by(UserSession.logged_in_at.desc())
+        .offset(skip)
+        .limit(limit)
+        .all()
+    )
+
+
 def revoke_all_user_sessions(db: Session, user_id: int) -> None:
     """Revoca todas las sesiones activas de un usuario (ej. tras cambio de contraseña)."""
     active_sessions = (

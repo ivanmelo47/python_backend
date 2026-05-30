@@ -54,6 +54,15 @@ async def generic_exception_handler(_: Request, exc: Exception) -> JSONResponse:
     payload = error_response(message=str(exc), code=500)
     return JSONResponse(status_code=500, content=payload.model_dump())
 
+from fastapi.staticfiles import StaticFiles
+import os
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+PUBLIC_DIR = BASE_DIR / "public"
+os.makedirs(PUBLIC_DIR / "icons" / "svg", exist_ok=True)
+app.mount("/api/v1/public", StaticFiles(directory=str(PUBLIC_DIR)), name="public")
+
 app.include_router(api_router, prefix="/api/v1")
 
 

@@ -15,6 +15,9 @@ from app.schemas.user_schema import (
     ForgotPasswordRequest,
     ResetPasswordRequest,
 )
+from app.schemas.app_config_global_schema import AppConfigGlobalUpdate, AppConfigGlobalResponse
+from app.repositories.app_config_global_repository import app_config_global_repository
+from app.common.dependencies.pagination import PaginationParams, common_pagination
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -114,3 +117,27 @@ def reset_password(
         message="Your password has been successfully reset. All active sessions have been terminated for security.",
         code=200
     ).model_dump()
+
+
+@router.post("/app-config", response_model=None)
+def update_app_config(
+    payload: AppConfigGlobalUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(auth_service.get_current_user),
+) -> dict:
+    config = app_config_global_repository.update_or_create(db, current_user.id, payload)
+    return success_response(
+        data=AppConfigGlobalResponse.model_validate(config),
+        message="App config updated successfully"
+    ).model_dump()
+
+
+@router.get("/login-activities", response_model=None)
+def get_login_activities(
+    pagination: PaginationParams = Depends(common_pagination),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(auth_service.require_admin),
+) -> dict:
+    sessions = user_session_repository.get_all_login_activities(db, skip=pagination.skip, limit=pagination.limit)
+    data = [UserSessionRead.model_validate(s) for s in sessions]
+    return success_response(data=data, message="Login activities retrieved").model_dump()

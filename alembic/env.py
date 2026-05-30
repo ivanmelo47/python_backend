@@ -15,6 +15,7 @@ from app.models import user_session_model  # noqa: F401
 from app.models import system_config_model  # noqa: F401
 from app.models import icon_model  # noqa: F401
 from app.models import dynamic_route_model  # noqa: F401
+from app.models import app_config_global_model  # noqa: F401
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

@@ -6,6 +6,7 @@ T = TypeVar("T")
 
 
 class StandardResponse(BaseModel, Generic[T]):
+    success: bool
     status: str
     code: int
     message: str
@@ -15,8 +16,8 @@ class StandardResponse(BaseModel, Generic[T]):
 
 
 def success_response(data: T | None = None, *, message: str = "OK", code: int = 200) -> StandardResponse[T]:
-    return StandardResponse(status="success", code=code, message=message, data=data)
+    return StandardResponse(success=True, status="success", code=code, message=message, data=data)
 
 
 def error_response(*, message: str, code: int) -> StandardResponse[None]:
-    return StandardResponse(status="error", code=code, message=message, data=None)
+    return StandardResponse(success=False, status="error", code=code, message=message, data=None)
